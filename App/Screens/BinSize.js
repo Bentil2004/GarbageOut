@@ -43,7 +43,7 @@ const BinSize = () => {
   };
 
   const onProceedPressed = () => {
-    navigation.navigate('ScheduleConfirmation');
+    navigation.navigate('Schedule');
   };
 
   return (

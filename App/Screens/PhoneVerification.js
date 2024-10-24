@@ -34,6 +34,7 @@ const PhoneVerification = () => {
               textContainerStyle={styles.textInput}
               flagButtonStyle={styles.flagButton}
               textInputProps={{ placeholder: "Phone number" }}
+              placeholderTextColor="#888"
             />
           </View>
 

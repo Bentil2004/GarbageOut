@@ -6,10 +6,11 @@ const ScheduleConfirmation = () => {
   const navigation = useNavigation();
 
   const onbackPressed = () => {
-    navigation.goBack('BinSize');
+    navigation.navigate('Schedule');
   };
   return (
     <View style={styles.container}>
+
         <TouchableOpacity onPress={onbackPressed}>
           <Text style={styles.backButton}>←</Text>
         </TouchableOpacity>
@@ -30,7 +31,7 @@ const ScheduleConfirmation = () => {
             <Text style={styles.label}>Schedule date:</Text> <Text style={styles.value}>24/10/2024</Text>
           </Text>
           <Text style={styles.detailItem}>
-            <Text style={styles.label}>Duration:</Text> <Text style={styles.value}>Once</Text>
+            <Text style={styles.label}>Duration:</Text> <Text style={styles.value}>Repeat Daily</Text>
           </Text>
           <Text style={styles.detailItem}>
             <Text style={styles.label}>Price:</Text> <Text style={styles.value}>$100.00</Text>
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#ffff',
     padding: 30,
   },
   header: {

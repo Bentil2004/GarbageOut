@@ -72,7 +72,6 @@ const OnbordingScreen = () => {
         scrollEventThrottle={16}
       />
 
-      {/* Bottom Text */}
       <View style={styles.bottomTextContainer}>
         {screens[currentIndex] && (
           <Text style={styles.bottomText}>
@@ -81,7 +80,6 @@ const OnbordingScreen = () => {
         )}
       </View>
 
-      {/* Indicator Dots */}
       <View style={styles.indicatorContainer}>
         {screens.map((_, index) => (
           <View
@@ -96,7 +94,6 @@ const OnbordingScreen = () => {
         ))}
       </View>
 
-      {/* Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}

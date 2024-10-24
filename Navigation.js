@@ -12,6 +12,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import ScheduleConfirmation from "./app/Screens/ScheduleConfirmation";
 import BinSize from "./app/Screens/BinSize";
 import Home from "./app/Screens/Home";
+import Notification from "./app/Screens/Notification";
 
 
 const Stack = createNativeStackNavigator();
@@ -21,14 +22,15 @@ const Navigation = () => {
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
+            <Stack.Screen name="BinSize" component={BinSize} />
             <Stack.Screen name="Onbording" component={Onbording} />
             <Stack.Screen name="PhoneVerification" component={PhoneVerification} />
             <Stack.Screen name="Verification" component={Verification} />
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
             <Stack.Screen name="ScheduleConfirmation" component={ScheduleConfirmation} />
-            <Stack.Screen name="BinSize" component={BinSize} />
             <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Notification" component={Notification} />
           </Stack.Navigator>
         </NavigationContainer>
   );

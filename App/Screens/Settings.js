@@ -59,7 +59,7 @@ export default Settings;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#fff',
   },
   header: {
     fontSize: 34,

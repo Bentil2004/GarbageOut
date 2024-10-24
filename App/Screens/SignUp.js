@@ -31,8 +31,8 @@ const SignUp = () => {
           />
 
           <View style={styles.inputContainer}>
-            <TextInput placeholder="First name" style={styles.input} />
-            <TextInput placeholder="Last name" style={styles.input} />
+            <TextInput placeholder="First name" placeholderTextColor="#888" style={styles.input} />
+            <TextInput placeholder="Last name" placeholderTextColor="#888" style={styles.input} />
           </View>
 
           <TouchableOpacity style={styles.button} onPress={onNextPressed}>
@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 20,
     marginBottom: 10,
+    borderColor: "#ccc",
   },
   button: {
     width: "90%",
