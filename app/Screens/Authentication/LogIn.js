@@ -29,9 +29,11 @@ const LogIn = () => {
     setShowPassword(!showPassword);
   };
 
-  const validateEmail = (email) => {
+  const trimEmail = email.trim()
+
+  const validateEmail = (trimEmail) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
+    return re.test(trimEmail);
   };
 
   const validatePassword = (password) => {
