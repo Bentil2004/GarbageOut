@@ -1,9 +1,9 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import handleErrorResponse from '../utility/statusCode.js';
+import { handleErrorResponse } from '../utility/statusCode.js';
 import { getStatusMessageByEndpointAndCode } from '../utility/statusCode.js';
-import db from '../services/firebase.js'; 
-import { validateCustomerFields } from '../utility/validation.js';
+// import db from '../services/firebase.js'; 
+import { validateUserFields } from '../utility/validation.js';
 import { customer_col } from '../services/collection_name.js';
 
 
@@ -11,9 +11,9 @@ const router = express.Router();
 
 // Create customer
 router.post('/add', async (req, res) => {
-    const validation = validateCustomerFields(req.body);
+    const validation = validateUserFields(req.body);
     if (!validation.isValid) {
-        return handleErrorResponse(res, 'customer', '4000', validation.error);
+        return handleErrorResponse(res, 'customer', '4000');
     }
 
     const { first_name, last_name, customer_id } = req.body;
@@ -24,7 +24,7 @@ router.post('/add', async (req, res) => {
 
         const existingCustomer = await customer_col.doc(customer_id).get();
         if (existingCustomer.exists) {
-            return handleErrorResponse(res, 'customer', '4001', 'Customer already exists');
+            return handleErrorResponse(res, 'customer', '4001');
         }
 
         await customer_col.doc(customer_id).set(customerData);
@@ -91,7 +91,7 @@ router.get('/:customer_id', async (req, res) => {
     try {
         const customerSnapshot = await customer_col.doc(customer_id).get();
         if (!customerSnapshot.exists) {
-            return handleErrorResponse(res, 'customer', '4002', 'Customer not found');
+            return handleErrorResponse(res, 'customer', '4002');
         }
 
         const customerData = customerSnapshot.data();
@@ -120,7 +120,7 @@ router.put('/:customer_id', async (req, res) => {
 
         const customerDoc = await customer_col.doc(customer_id).get();
         if (!customerDoc.exists) {
-            return handleErrorResponse(res, 'customer', '4002', 'Customer not found');
+            return handleErrorResponse(res, 'customer', '4002');
         }
 
         await customer_col.doc(customer_id).update(updatedData);
@@ -146,7 +146,7 @@ router.delete('/:customer_id', async (req, res) => {
     try {
         const customerDoc = await customer_col.doc(customer_id).get();
         if (!customerDoc.exists) {
-            return handleErrorResponse(res, 'customer', '4002', 'Customer not found');
+            return handleErrorResponse(res, 'customer', '4002');
         }
 
         const deleted_at = admin.firestore.FieldValue.serverTimestamp();
