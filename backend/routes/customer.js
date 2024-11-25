@@ -1,11 +1,8 @@
 import express from 'express';
 import admin from 'firebase-admin';
-import { handleErrorResponse } from '../utility/statusCode.js';
-import { getStatusMessageByEndpointAndCode } from '../utility/statusCode.js';
-// import db from '../services/firebase.js'; 
+import { handleErrorResponse, getStatusMessageByEndpointAndCode } from '../utility/statusCode.js';
 import { validateUserFields } from '../utility/validation.js';
 import { customer_col } from '../services/collection_name.js';
-
 
 const router = express.Router();
 
@@ -13,7 +10,7 @@ const router = express.Router();
 router.post('/add', async (req, res) => {
     const validation = validateUserFields(req.body);
     if (!validation.isValid) {
-        return handleErrorResponse(res, 'customer', '4000');
+        return handleErrorResponse(res, 'customer', '4000', validation.message);
     }
 
     const { first_name, last_name, customer_id } = req.body;
@@ -46,22 +43,16 @@ router.post('/add', async (req, res) => {
 // Get all customers
 router.get('/', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
-    let customers = [];
-    let lastVisible = null;
+    const parsedPage = parseInt(page);
+    const parsedLimit = parseInt(limit);
 
     try {
-        const customerQuery = customer_col.orderBy('created_at').limit(limit);
+        const querySnapshot = await customer_col.orderBy('created_at')
+            .offset((parsedPage - 1) * parsedLimit)
+            .limit(parsedLimit)
+            .get();
 
-        if (offset > 0 && lastVisible) {
-            const snapshot = await customerQuery.startAfter(lastVisible).get();
-            customers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            lastVisible = snapshot.docs[snapshot.docs.length - 1];
-        } else {
-            const snapshot = await customerQuery.get();
-            customers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            lastVisible = snapshot.docs[snapshot.docs.length - 1];
-        }
+        const customers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         const { message, code, event } = getStatusMessageByEndpointAndCode('customer', '1001');
         return res.status(200).json({
@@ -72,9 +63,9 @@ router.get('/', async (req, res) => {
             data: {
                 customers,
                 pagination: {
-                    page: parseInt(page),
-                    limit: parseInt(limit),
-                    nextPage: lastVisible ? page + 1 : null,
+                    page: parsedPage,
+                    limit: parsedLimit,
+                    nextPage: customers.length === parsedLimit ? parsedPage + 1 : null,
                 },
             },
             error: null,
@@ -86,7 +77,7 @@ router.get('/', async (req, res) => {
 
 // Get a single customer
 router.get('/:customer_id', async (req, res) => {
-    const customer_id = getCustomerIdFromRequest(req);
+    const { customer_id } = req.params;
 
     try {
         const customerSnapshot = await customer_col.doc(customer_id).get();
@@ -111,7 +102,7 @@ router.get('/:customer_id', async (req, res) => {
 
 // Update a customer
 router.put('/:customer_id', async (req, res) => {
-    const customer_id = getCustomerIdFromRequest(req);
+    const { customer_id } = req.params;
     const { first_name, last_name } = req.body;
 
     try {
@@ -141,7 +132,7 @@ router.put('/:customer_id', async (req, res) => {
 
 // Delete a customer
 router.delete('/:customer_id', async (req, res) => {
-    const customer_id = getCustomerIdFromRequest(req);
+    const { customer_id } = req.params;
 
     try {
         const customerDoc = await customer_col.doc(customer_id).get();
@@ -149,12 +140,11 @@ router.delete('/:customer_id', async (req, res) => {
             return handleErrorResponse(res, 'customer', '4002');
         }
 
-        const deleted_at = admin.firestore.FieldValue.serverTimestamp();
-        await customer_col.doc(customer_id).update({ is_deleted: true, deleted_at });
+        // Delete the document
+        await customer_col.doc(customer_id).delete();
 
         const { message, code, event } = getStatusMessageByEndpointAndCode('customer', '1003');
         return res.status(200).json({
-            status: true,
             message,
             code,
             event,
@@ -165,5 +155,6 @@ router.delete('/:customer_id', async (req, res) => {
         return handleErrorResponse(res, 'customer', '5004', error.message);
     }
 });
+
 
 export default router;
