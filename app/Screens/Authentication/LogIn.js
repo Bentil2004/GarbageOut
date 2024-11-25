@@ -60,7 +60,7 @@ const LogIn = () => {
 
   const signInWithEmail = async () => {
     if (validateForm()) {
-      setLoading(true); // Enable loading state
+      setLoading(true); 
       try {
         const userCredential = await signInWithEmailAndPassword(
           FIREBASE_AUTH,
@@ -81,7 +81,7 @@ const LogIn = () => {
 
         Alert.alert("Error", errorMessage);
       } finally {
-        setLoading(false); // Disable loading state
+        setLoading(false); 
       }
     }
   };

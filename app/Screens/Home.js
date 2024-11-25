@@ -16,9 +16,9 @@ const Home = () => {
   const navigation = useNavigation();
 
   const upcomingPickups = [
-    // { id: 1, date: "24th Fri", time: "09:00 PM" },
-    // { id: 2, date: "25th Sat", time: "10:00 AM" },
-    // { id: 3, date: "26th Sun", time: "06:00 PM" },
+    { id: 1, date: "24th Fri", time: "09:00 PM" },
+    { id: 2, date: "25th Sat", time: "10:00 AM" },
+    { id: 3, date: "26th Sun", time: "06:00 PM" },
   ];
 
   const onNotificationPressed = () => {
