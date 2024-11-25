@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import customer from './routes/customer.js';
+import schedule_pick_up from './routes/schedule_pickup.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/v1/customer", customer);
+app.use("/v1/schedule_pickup", schedule_pick_up);
 
 app.get("/", async (req, res) => {
     res.status(200).send({
