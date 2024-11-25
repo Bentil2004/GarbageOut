@@ -57,6 +57,11 @@ const SignUpScreen = () => {
       valid = false;
     }
 
+    if (password.length < 8) {
+      newErrors.passwordRepeat = "Password must be at least 8 characters long";
+      valid = false;
+    }
+
     if (password !== passwordRepeat) {
       newErrors.passwordRepeat = "Passwords do not match";
       valid = false;

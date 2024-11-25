@@ -13,36 +13,76 @@ import React, { useState } from "react";
 import CheckBox from "react-native-check-box";
 import { useNavigation } from "@react-navigation/native";
 import { FIREBASE_FIRESTORE } from "../../../backend/FirebaseConfig";
-import {
-  collection,
-  doc,
-} from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OnbordSignUp = () => {
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   const navigation = useNavigation();
 
-  const onNextPressed = () => {
-    navigation.navigate("BottomTabNavigator");
+  const onNextPressed = async () => {
+    if (firstName === "" || lastName === "") {
+      alert("Please fill in both first name and last name.");
+      return;
+    }
+    
+    try {
+      const uid_id = await AsyncStorage.getItem("uid"); 
+
+      if (!uid) {
+        console.error("UID not found");
+        return;
+      }
+
+      const userData = {
+        customer_id: uid_id,
+        first_name: firstName,
+        last_name: lastName,
+        created_at: new Date(),
+        updated_at: new Date(),
+        is_terms_accepted: isTermsAccepted,
+        is_notifications_enabled: isNotificationsEnabled,
+      };
+
+      const customersCollection = collection(FIREBASE_FIRESTORE, "customers");
+      const customerDocRef = doc(customersCollection, uid);
+
+      await setDoc(customerDocRef, userData);
+
+      navigation.navigate("BottomTabNavigator");
+    } catch (error) {
+      console.error("Error saving user data: ", error);
+    }
   };
 
   const onTermsPressed = async () => {
-    const uid = AsyncStorage.getItem("uid");
+    try {
+      const uid = await AsyncStorage.getItem("uid"); 
 
-    // this is the body of the
-    const userData = {
-      customer_id: uid,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
+      if (!uid) {
+        console.error("UID not found");
+        return; 
+      }
 
-    // get a refence to the firestore collection and document
-    const customersCollection = collection(FIREBASE_FIRESTORE, "customers");
-    const customerDocRef = doc(customersCollection, uid);
-    await setDoc(customerDocRef, userData);
-    navigation.navigate("Terms");
+      const userData = {
+        customer_id: uid,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+
+      const customersCollection = collection(FIREBASE_FIRESTORE, "customers");
+      const customerDocRef = doc(customersCollection, uid);
+
+      await setDoc(customerDocRef, userData);
+
+      navigation.navigate("Terms");
+    } catch (error) {
+      console.error("Error saving user data: ", error);
+    }
   };
 
   return (
@@ -67,11 +107,15 @@ const OnbordSignUp = () => {
             placeholder="First name"
             placeholderTextColor="#888"
             style={styles.input}
+            value={firstName}
+            onChangeText={setFirstName}
           />
           <TextInput
             placeholder="Last name"
             placeholderTextColor="#888"
             style={styles.input}
+            value={lastName}
+            onChangeText={setLastName}
           />
         </View>
 
