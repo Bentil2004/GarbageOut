@@ -3,7 +3,7 @@
 # dependencies
 node_modules/
 
-serviceAccount.json
+backend/serviceAccount.json
 
 # Expo
 .expo/
