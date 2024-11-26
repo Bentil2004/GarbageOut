@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,7 +10,6 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import React, { useState } from "react";
 import CheckBox from "react-native-check-box";
 import { useNavigation } from "@react-navigation/native";
 import { FIREBASE_FIRESTORE } from "../../../backend/FirebaseConfig";
@@ -21,6 +21,7 @@ const OnbordSignUp = () => {
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
 
@@ -29,17 +30,19 @@ const OnbordSignUp = () => {
       alert("Please fill in both first name and last name.");
       return;
     }
-    
+
+    setLoading(true); 
     try {
-      const uid_id = await AsyncStorage.getItem("uid"); 
+      const uid = await AsyncStorage.getItem("uid",uid);
 
       if (!uid) {
         console.error("UID not found");
+        setLoading(false); 
         return;
       }
 
       const userData = {
-        customer_id: uid_id,
+        customer_id: uid,
         first_name: firstName,
         last_name: lastName,
         created_at: new Date(),
@@ -56,16 +59,18 @@ const OnbordSignUp = () => {
       navigation.navigate("BottomTabNavigator");
     } catch (error) {
       console.error("Error saving user data: ", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const onTermsPressed = async () => {
     try {
-      const uid = await AsyncStorage.getItem("uid"); 
+      const uid = await AsyncStorage.getItem("uid");
 
       if (!uid) {
         console.error("UID not found");
-        return; 
+        return;
       }
 
       const userData = {
@@ -119,8 +124,15 @@ const OnbordSignUp = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={onNextPressed}>
-          <Text style={styles.buttonText}>Next</Text>
+   
+        <TouchableOpacity
+          style={[styles.button, loading && { opacity: 0.7 }]}
+          onPress={onNextPressed}
+          disabled={loading} 
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Processing..." : "Next"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.checkboxContainer}>
@@ -140,7 +152,9 @@ const OnbordSignUp = () => {
           <View style={styles.checkboxRow}>
             <CheckBox
               isChecked={isNotificationsEnabled}
-              onClick={() => setIsNotificationsEnabled(!isNotificationsEnabled)}
+              onClick={() =>
+                setIsNotificationsEnabled(!isNotificationsEnabled)
+              }
               style={styles.checkbox}
             />
             <Text style={styles.checkboxText}>
