@@ -7,7 +7,7 @@ import { schedule_pickup_col } from '../services/collection_name.js';
 
 const router = express.Router();
 
-// Create garbage pickup
+// Create schedule pickup
 router.post('/add', async (req, res) => {
     const validation = validatePickupFields(req.body);
     if (!validation.isValid) {
@@ -47,7 +47,7 @@ router.post('/add', async (req, res) => {
     }
 });
 
-// Get all garbage pickups
+// Get all schedule pickups
 router.get('/', async (req, res) => {
     const { page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -88,7 +88,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get a single garbage pickup
+// Get a single schedule pickup
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -113,7 +113,7 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// Update a garbage pickup
+// Update a schedule pickup
 router.put('/:id', async (req, res) => {
     const { id } = req.params;
     const { address, duration_for_pickup, bin_size, number_of_bag, google_location_coordinates, amount } = req.body;
@@ -151,7 +151,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Delete a garbage pickup
+// Delete a schedule pickup
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
 

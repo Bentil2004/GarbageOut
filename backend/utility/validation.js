@@ -17,7 +17,6 @@ export function validateUserFields(fields) {
     return { isValid: true, field: null };
 }
 
-// validatePickupFields.js
 export function validatePickupFields(fields) {
     const requiredFields = {
         customer_id: 'string',
@@ -37,7 +36,7 @@ export function validatePickupFields(fields) {
             return { isValid: false, field, error: `Field ${field} must be of type ${type}` };
         }
 
-        // Additional validation for google_location_coordinates (lat and lng)
+        // validation for google_location_coordinates (lat and lng)
         if (field === 'google_location_coordinates') {
             const { lat, lng } = fields[field];
             if (typeof lat !== 'number' || typeof lng !== 'number') {
@@ -45,12 +44,10 @@ export function validatePickupFields(fields) {
             }
         }
 
-        // Additional validation for number_of_bag (must be greater than 0)
         if (field === 'number_of_bag' && fields[field] <= 0) {
             return { isValid: false, field, error: 'number_of_bag must be greater than 0' };
         }
 
-        // Additional validation for amount (must be greater than 0)
         if (field === 'amount' && fields[field] <= 0) {
             return { isValid: false, field, error: 'amount must be greater than 0' };
         }
@@ -59,3 +56,27 @@ export function validatePickupFields(fields) {
     return { isValid: true, field: null };
 }
 
+export function validateUpcomingPickupFields(fields) {
+    const requiredFields = {
+        date: 'string',
+        time: 'string',
+        google_location_coordinates: 'object',
+        'google_location_coordinates.lat': 'number',
+        'google_location_coordinates.lng': 'number',
+    };
+
+    for (const [field, type] of Object.entries(requiredFields)) {
+        const keys = field.split('.');
+        const value = keys.reduce((acc, key) => acc?.[key], fields);
+
+        if (value === undefined || value === null) {
+            return { isValid: false, field, error: `Field ${field} is required` };
+        }
+
+        if (typeof value !== type) {
+            return { isValid: false, field, error: `Field ${field} must be of type ${type}` };
+        }
+    }
+
+    return { isValid: true, field: null };
+}

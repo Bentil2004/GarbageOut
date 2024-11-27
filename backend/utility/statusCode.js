@@ -28,6 +28,22 @@ export const statusMessages = {
         '5003': { message: 'Error updating schedule pickup', code: '5003', event: 'schedule_pickup.updating_failed' },
         '5004': { message: 'Error deleting schedule pickup', code: '5004', event: 'schedule_pickup.deleting_failed' },
     },
+    
+    upcoming_pickup: {
+        '1000': { message: 'Upcoming pickup added successfully', code: '1000', event: 'upcoming_pickup.added' },
+        '1001': { message: 'Upcoming pickup retrieved successfully', code: '1001', event: 'upcoming_pickup.retrieved' },
+        '1002': { message: 'Upcoming pickup updated successfully', code: '1001', event: 'upcoming_pickup.updated' },
+        '1003': { message: 'Upcoming pickup deleted successfully', code: '1001', event: 'upcoming_pickup.deleted' },
+        '4000': { message: 'Invalid field provided', code: '4000', event: 'upcoming_pickup.field_validation_error' },
+        '4001': { message: 'Schedule pickup exist', code: '4001', event: 'upcoming_pickup.customer_exist' },
+        '4002': { message: 'No upcoming pickup(s) found.', code: '4002', event: 'upcoming_pickup.not_found' },
+        '4003': { message: 'Latitude and longitude are required', code: '4003', event: 'upcoming_pickup.not_found' },
+        '5000': { message: 'Error adding upcoming pickup', code: '5000', event: 'upcoming_pickup.adding_failed' },
+        '5001': { message: 'Error adding upcoming pickup', code: '5001', event: 'upcoming_pickup.adding_failed' },
+        '5002': { message: 'Error retrieving upcoming pickup', code: '5002', event: 'upcoming_pickup.retrieving_failed' },
+        '5003': { message: 'Error updating upcoming pickup', code: '5003', event: 'upcoming_pickup.updating_failed' },
+        '5004': { message: 'Error deleting upcoming pickup', code: '5004', event: 'upcoming_pickup.deleting_failed' },
+    },
 
     auth_middleware: {
         '4001': { message: 'Authorization token is required', code: '4001', event: 'auth_middleware.token_required' },
