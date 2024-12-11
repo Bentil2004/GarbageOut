@@ -3,7 +3,7 @@ import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Aler
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../../backend/FirebaseConfig';
+import { FIREBASE_AUTH } from '../../../backend/FirebaseConfig'; 
 
 const ForgotPasswordEmail = () => {
   const navigation = useNavigation();
@@ -26,20 +26,23 @@ const ForgotPassword = ({ navigation }) => {
 
     try {
       const auth = getAuth(FIREBASE_AUTH);
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, email, {
+        url: "https://garbageout-6d502.firebaseapp.com", 
+        handleCodeInApp: true,
+      });
 
       Alert.alert(
         "Email Sent",
-        "A password reset link has been sent to your email. Please check your inbox.",
+        `A password reset link has been sent to ${email}. Please check your inbox.`,
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate("Login"), 
+            onPress: () => navigation.navigate("Login"),
           },
         ]
       );
     } catch (error) {
-      let errorMessage = "Something went wrong";
+      let errorMessage = "Something went wrong.";
       if (error.code === "auth/invalid-email") {
         errorMessage = "The email address is not valid.";
       } else if (error.code === "auth/user-not-found") {
@@ -57,7 +60,7 @@ const ForgotPassword = ({ navigation }) => {
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
       <View style={styles.container}>
-        <Text style={styles.title}>Forgot password</Text>
+        <Text style={styles.title}>Forgot Password</Text>
         <Text style={styles.subtitle}>Please enter your email to reset the password</Text>
         <View style={styles.inputContainer}>
           <Icon name="email" size={20} color="#707070" style={styles.icon} />
