@@ -9,14 +9,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import { validate } from "email-validator";
+import { FIREBASE_AUTH } from "../../../backend/FirebaseConfig";
+import { firebaseAuthErrorMessage } from "../../Services/FirebaseUtils";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { FIREBASE_AUTH } from "../../../backend/FirebaseConfig"; 
-
 
 const SignUpScreen = () => {
   const [email, setEmail] = useState("");
@@ -37,6 +38,15 @@ const SignUpScreen = () => {
     let valid = true;
     let newErrors = {};
 
+    // const trimmedEmail = email.trim();
+
+    // if (!validate(trimmedEmail)) {
+    //   newErrors.email = "Please enter a valid email";
+    //   valid = false;
+    // }
+
+    const sanitizedEmail = email.replace(/\s+/g, "");
+    
     if (!validate(email)) {
       newErrors.email = "Please enter a valid email";
       valid = false;
@@ -47,7 +57,7 @@ const SignUpScreen = () => {
       valid = false;
     }
 
-    if (passwordRepeat.length < 8) {
+    if (password.length < 8) {
       newErrors.passwordRepeat = "Password must be at least 8 characters long";
       valid = false;
     }
@@ -70,27 +80,22 @@ const SignUpScreen = () => {
           email,
           password
         );
-        const user = userCredential.user;
+        const { user } = userCredential;
+
+        const { uid } = user;
+        await AsyncStorage.setItem("uid", uid);
+
         Alert.alert("Success", "You have successfully signed up!");
-        navigation.navigate("OnbordSignUp", { userId: user.uid });
+        navigation.navigate("OnbordSignUp", { userId: uid });
       } catch (error) {
-        let errorMessage = "Something went wrong"; 
-  
-        if (error.code === "auth/email-already-in-use") {
-          errorMessage = "This email is already in use. Please use a different email.";
-        } else if (error.code === "auth/invalid-email") {
-          errorMessage = "The email address is not valid.";
-        } else if (error.code === "auth/weak-password") {
-          errorMessage = "The password is too weak. Please use a stronger password.";
-        }
-  
-        Alert.alert("Error", errorMessage);
+        const message = firebaseAuthErrorMessage(error);
+        Alert.alert("Error", message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     }
   };
-  
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
