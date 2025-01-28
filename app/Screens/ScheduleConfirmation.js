@@ -26,7 +26,7 @@ const ScheduleConfirmation = ({ route }) => {
 
   const onConfirmPayment = () => {
     setModalVisible(false);
-    navigation.navigate('Payment');
+    navigation.navigate("BottomTabNavigator",{screen: "Payment",});
   };
 
   return (
@@ -55,7 +55,7 @@ const ScheduleConfirmation = ({ route }) => {
                 <Text style={styles.value}>{bin.size}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Text style={styles.label}>Bags:</Text>
+                <Text style={styles.label}>Bag:</Text>
                 <Text style={styles.value}>{bin.bags}</Text>
               </View>
               <View style={styles.detailRow}>
