@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, TouchableOpacity, Image, ScrollView, 
-  StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback 
+import {
+  View, Text, TouchableOpacity, Image, ScrollView,
+  StyleSheet, Keyboard, TouchableWithoutFeedback,Modal
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const bins = [
   { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
@@ -19,7 +20,14 @@ const AddScheduleScreen = ({ route }) => {
   const [locationName, setLocationName] = useState('');
   const [selectedBins, setSelectedBins] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [open, setOpen] = useState(false);  
+  const [isModalVisible, setIsModalVisible] = useState(false); 
   const navigation = useNavigation();
+
+  const locations = [
+    { label: 'Home', value: 'home' },
+    { label: 'Office', value: 'office' },
+  ];
 
   const handleSelectBin = (id) => {
     if (!selectedBins.includes(id)) {
@@ -46,6 +54,20 @@ const AddScheduleScreen = ({ route }) => {
     });
   };
 
+  const fetchCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setAddress(`Lat: ${latitude}, Lon: ${longitude}`);
+        setIsModalVisible(false);
+      },
+      (error) => {
+        console.error(error);
+        setIsModalVisible(false);
+      }
+    );
+  };
+
   useEffect(() => {
     if (route.params?.confirmedAddress) {
       setAddress(route.params.confirmedAddress);
@@ -56,28 +78,60 @@ const AddScheduleScreen = ({ route }) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <Text style={styles.header}>Schedule new pickup</Text>
-
         <View style={styles.addressContainer}>
           <Text style={styles.sectionTitletop}>Please select an address</Text>
           <View style={styles.addressCard}>
-            <View style={styles.addressRow}>
-              <Icon name="location-outline" size={22} color="#7C6DDD" />
-              <TextInput
-                style={styles.locationInput}
-                placeholder="e.g., Home, Office"
-                value={locationName}
-                onChangeText={setLocationName}
-              />
-            </View>
+            <DropDownPicker
+              open={open}
+              value={locationName}
+              items={locations}
+              setOpen={setOpen}
+              setValue={setLocationName}
+              setItems={() => {}}
+              containerStyle={styles.dropdownContainer}
+              dropDownStyle={styles.dropDownStyle}
+              placeholder="Select a location"
+            />
+            <TouchableOpacity 
+              style={styles.plusIconContainer} 
+              onPress={() => setIsModalVisible(true)}
+            >
+              <Icon name="add-circle-outline" size={30} color="#fff" />
+            </TouchableOpacity>
           </View>
         </View>
+
+        <Modal
+          visible={isModalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setIsModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Please stand at the pickup point</Text>
+              <TouchableOpacity 
+                style={styles.modalButton} 
+                onPress={fetchCurrentLocation} 
+              >
+                <Text style={styles.modalButtonText}>Get My Location</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.modalButton} 
+                onPress={() => setIsModalVisible(false)} 
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.checkboxContainer}>
           <Text style={styles.sectionTitlemid}>Duration For Pickup</Text>
           {['Daily', 'Weekly', 'Twice Weekly'].map((option, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.checkboxRow} 
+            <TouchableOpacity
+              key={index}
+              style={styles.checkboxRow}
               onPress={() => setRepeatOption(option)}
             >
               <Icon
@@ -152,16 +206,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
   },
   addressContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginBottom: 10,
   },
   addressCard: {
     backgroundColor: 'white',
-    // padding: 10,
     borderRadius: 10,
     borderColor: '#ccc',
     borderWidth: 1,
-    width: 300
+    width: 300,
+    position: 'relative',
   },
   addressRow: {
     flexDirection: 'row',
@@ -178,6 +232,12 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 10,
     height: 40,
+  },
+  dropDownStyle: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderRadius: 10,
+    marginTop: 5,
   },
   checkboxContainer: {
     marginTop: 0,
@@ -305,7 +365,6 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 1,
     marginBottom: 5,
-    marginHorizontal: 5,
     marginHorizontal: 20,
   },
   sectionTitlemid: {
@@ -323,5 +382,48 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     marginHorizontal: 20,
+  },
+  plusIconContainer: {
+    position: 'absolute',
+    right: -55, 
+    top: '30%',
+    transform: [{ translateY: -15 }],
+    // borderWidth: 1,
+    width: 50,
+    height: 50,
+    backgroundColor: '#7C6DDD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: 'red',
+  },
+  modalButton: {
+    backgroundColor: '#7C6DDD',
+    paddingVertical: 10,
+    paddingHorizontal: 40,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });

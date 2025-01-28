@@ -31,6 +31,7 @@ const Navigation = () => {
   return (
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="LogIn" component={LogIn} />  
             {/* <Stack.Screen name="OnbordSignUp" component={OnbordSignUp} /> */}
@@ -46,7 +47,6 @@ const Navigation = () => {
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
             <Stack.Screen name="Delete" component={Delete} />
             <Stack.Screen name="About" component={About} />   
-            <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
             <Stack.Screen name="Address" component={Address} />
             <Stack.Screen name="LanguageChange" component={LanguageChange} />
             <Stack.Screen name="Support" component={Support} />
