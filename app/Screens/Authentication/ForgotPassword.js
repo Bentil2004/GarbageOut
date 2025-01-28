@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../../backend/FirebaseConfig'; 
 
 const ForgotPasswordEmail = () => {
   const navigation = useNavigation();
@@ -25,28 +23,27 @@ const ForgotPassword = ({ navigation }) => {
     }
 
     try {
-      const auth = getAuth(FIREBASE_AUTH);
-      await sendPasswordResetEmail(auth, email, {
-        url: "https://garbageout-6d502.firebaseapp.com", 
-        handleCodeInApp: true,
-      });
+      // Mocking password reset logic
+      const isMockSuccess = true; // Simulate success or failure
 
-      Alert.alert(
-        "Email Sent",
-        `A password reset link has been sent to ${email}. Please check your inbox.`,
-        [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("Login"),
-          },
-        ]
-      );
+      if (isMockSuccess) {
+        Alert.alert(
+          "Email Sent",
+          `A password reset link has been sent to ${email}. Please check your inbox.`,
+          [
+            {
+              text: "OK",
+              onPress: () => navigation.navigate("Login"),
+            },
+          ]
+        );
+      } else {
+        throw new Error("mock_error");
+      }
     } catch (error) {
       let errorMessage = "Something went wrong.";
-      if (error.code === "auth/invalid-email") {
-        errorMessage = "The email address is not valid.";
-      } else if (error.code === "auth/user-not-found") {
-        errorMessage = "No user found with this email.";
+      if (error.message === "mock_error") {
+        errorMessage = "The email address is not valid or the user does not exist.";
       }
       Alert.alert("Error", errorMessage);
     }

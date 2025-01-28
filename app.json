@@ -19,14 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.fiifi_bentil.GarbageOut"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-build-properties"
-    ]
-    
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ebb6a53d-d6b6-4638-b98d-103a5df7cadc"
+      }
+    }
   }
 }

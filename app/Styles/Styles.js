@@ -29,7 +29,7 @@ export const HomePage = StyleSheet.create({
     height: 210,
   },
   greetingText: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: "bold",
     color: "white",
     marginBottom: 8,

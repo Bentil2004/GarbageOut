@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { 
+  View, Text, TouchableOpacity, Image, ScrollView, 
+  StyleSheet, TextInput, Keyboard, TouchableWithoutFeedback 
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 
 const bins = [
-    { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
-    { id: 2, name: 'Standard', size: '140 litre bin', bags: '3 full black bags', price: 60 },
-    { id: 3, name: 'Large', size: '140 litre bin', bags: '4-5 full black bags', price: 70 },
-    { id: 4, name: 'Extra Large', size: '140 litre bin', bags: '6-8 full black bags', price: 100 },
+  { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
+  { id: 2, name: 'Standard', size: '140 litre bin', bags: '3 full black bags', price: 60 },
+  { id: 3, name: 'Large', size: '140 litre bin', bags: '4-5 full black bags', price: 70 },
+  { id: 4, name: 'Extra Large', size: '140 litre bin', bags: '6-8 full black bags', price: 100 },
 ];
 
 const AddScheduleScreen = ({ route }) => {
@@ -53,8 +56,9 @@ const AddScheduleScreen = ({ route }) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <Text style={styles.header}>Schedule new pickup</Text>
+
         <View style={styles.addressContainer}>
-          <Text style={styles.sectionTitletop}>Address Description</Text>
+          <Text style={styles.sectionTitletop}>Please select an address</Text>
           <View style={styles.addressCard}>
             <View style={styles.addressRow}>
               <Icon name="location-outline" size={22} color="#7C6DDD" />
@@ -62,7 +66,7 @@ const AddScheduleScreen = ({ route }) => {
                 style={styles.locationInput}
                 placeholder="e.g., Home, Office"
                 value={locationName}
-                onChangeText={setLocationName} 
+                onChangeText={setLocationName}
               />
             </View>
           </View>
@@ -71,7 +75,11 @@ const AddScheduleScreen = ({ route }) => {
         <View style={styles.checkboxContainer}>
           <Text style={styles.sectionTitlemid}>Duration For Pickup</Text>
           {['Daily', 'Weekly', 'Twice Weekly'].map((option, index) => (
-            <TouchableOpacity key={index} style={styles.checkboxRow} onPress={() => setRepeatOption(option)}>
+            <TouchableOpacity 
+              key={index} 
+              style={styles.checkboxRow} 
+              onPress={() => setRepeatOption(option)}
+            >
               <Icon
                 name={repeatOption === option ? "radio-button-on" : "radio-button-off"}
                 size={20}
@@ -83,6 +91,7 @@ const AddScheduleScreen = ({ route }) => {
         </View>
 
         <Text style={styles.sectionTitledown}>Size of Bin</Text>
+        <Text style={styles.sectionSubtext}>Please select the bin size</Text>
 
         <ScrollView style={styles.binListContainer}>
           {bins.map((bin) => (
@@ -152,6 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#ccc',
     borderWidth: 1,
+    width: 300
   },
   addressRow: {
     flexDirection: 'row',
@@ -185,7 +195,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   binListContainer: {
-    maxHeight: 250,
+    maxHeight: 320,
     paddingHorizontal: 20,
     marginBottom: 30,
   },
@@ -274,7 +284,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginHorizontal: 20,
     borderRadius: 10,
-    marginTop: 15,
+    marginTop: 5,
   },
   scheduleButtonText: {
     color: 'white',
@@ -289,6 +299,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     marginHorizontal: 5,
+  },
+  sectionSubtext: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 1,
+    marginBottom: 5,
+    marginHorizontal: 5,
+    marginHorizontal: 20,
   },
   sectionTitlemid: {
     fontSize: 18,

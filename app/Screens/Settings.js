@@ -33,7 +33,7 @@ const Settings = () => {
 
   const confirmLogout = () => {
     setModalVisible(false);
-   navigation.navigate('PhoneVerification')
+   navigation.navigate('OnbordSignUp')
   };
 
   const cancelLogout = () => {
