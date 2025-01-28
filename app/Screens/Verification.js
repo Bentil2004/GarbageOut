@@ -42,7 +42,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
 
     setTimeout(() => {
       setLoading(false); 
-      navigation.navigate('SignUp');
+      navigation.navigate('LogIn');
     }, 1000);
   };
 

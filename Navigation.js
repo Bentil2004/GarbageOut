@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Splash from "./app/Screens/SplashScreen";
 import Onbording from "./app/Screens/OnbordingScreen";
-import OnbordSignUp from "./app/Screens/Authentication/OnbordSignUp";
+// import OnbordSignUp from "./app/Screens/Authentication/OnbordSignUp";
 import PhoneVerification from "./app/Screens/PhoneVerification";
 import Verification from "./app/Screens/Verification";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -33,7 +33,7 @@ const Navigation = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="LogIn" component={LogIn} />  
-            <Stack.Screen name="OnbordSignUp" component={OnbordSignUp} />
+            {/* <Stack.Screen name="OnbordSignUp" component={OnbordSignUp} /> */}
             {/* <Stack.Screen name="BinSize" component={BinSize} /> */}
             <Stack.Screen name="Onbording" component={Onbording} />
             <Stack.Screen name="PhoneVerification" component={PhoneVerification} />

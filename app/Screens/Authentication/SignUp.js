@@ -9,18 +9,16 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
+import PhoneInput from "react-native-phone-number-input";
 import { useNavigation } from "@react-navigation/native";
-import { validate } from "email-validator";
-import { FIREBASE_AUTH } from "../../../backend/FirebaseConfig";
-import { firebaseAuthErrorMessage } from "../../Services/FirebaseUtils";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import axios from "axios";
 
 const SignUpScreen = () => {
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [formattedValue, setFormattedValue] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,27 +36,25 @@ const SignUpScreen = () => {
     let valid = true;
     let newErrors = {};
 
-    // const trimmedEmail = email.trim();
-
-    // if (!validate(trimmedEmail)) {
-    //   newErrors.email = "Please enter a valid email";
-    //   valid = false;
-    // }
-
-    const sanitizedEmail = email.replace(/\s+/g, "");
-    
-    if (!validate(email)) {
-      newErrors.email = "Please enter a valid email";
+    if (!formattedValue || formattedValue.length < 10) {
+      newErrors.phoneNumber = "Please enter a valid phone number";
       valid = false;
     }
 
-    if (password.length < 8) {
+    if (!password || password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long";
       valid = false;
-    }
-
-    if (password.length < 8) {
-      newErrors.passwordRepeat = "Password must be at least 8 characters long";
+    } else if (!/[A-Z]/.test(password)) {
+      newErrors.password = "Password must contain at least one uppercase letter";
+      valid = false;
+    } else if (!/[a-z]/.test(password)) {
+      newErrors.password = "Password must contain at least one lowercase letter";
+      valid = false;
+    } else if (!/[0-9]/.test(password)) {
+      newErrors.password = "Password must contain at least one digit";
+      valid = false;
+    } else if (!/[!@#$%^&*]/.test(password)) {
+      newErrors.password = "Password must contain at least one special character";
       valid = false;
     }
 
@@ -74,26 +70,41 @@ const SignUpScreen = () => {
   const handleSignUp = async () => {
     if (validateForm()) {
       setLoading(true);
+
+      const data = {
+        phone_number: formattedValue,
+        password: password,
+      };
+
       try {
-        const userCredential = await createUserWithEmailAndPassword(
-          FIREBASE_AUTH,
-          email,
-          password
+        const response = await axios.post(
+          "https://garbageout.pythonanywhere.com/accounts/register/",
+          data
         );
-        const { user } = userCredential;
 
-        const { uid } = user;
-        await AsyncStorage.setItem("uid", uid);
-
-        Alert.alert("Success", "You have successfully signed up!");
-        navigation.navigate("OnbordSignUp", { userId: uid });
+        if (response.status === 201) {
+          Alert.alert(
+            "Success",
+            "Registration successful! Please verify your account."
+          );
+          navigation.navigate("Verification"); 
+        } else {
+          Alert.alert("Error", "Something went wrong. Please try again.");
+        }
       } catch (error) {
-        const message = firebaseAuthErrorMessage(error);
-        Alert.alert("Error", message || "Something went wrong");
+        if (error.response) {
+          Alert.alert("Error", error.response.data.message || "Failed to register.");
+        } else {
+          Alert.alert("Error", "Network error. Please check your connection.");
+        }
       } finally {
         setLoading(false);
       }
     }
+  };
+
+  const onLoginPressed = () => {
+    navigation.navigate("LogIn");
   };
 
   return (
@@ -113,16 +124,24 @@ const SignUpScreen = () => {
             resizeMode="contain"
           />
 
-          <CustomInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            bordercolor={errors.email ? "red" : "#ccc"}
-            borderRadius={15}
-            iconName="mail"
-            accessibilityLabel="Email input field"
+          <PhoneInput
+            defaultValue={phoneNumber}
+            defaultCode="GH"
+            layout="first"
+            onChangeText={setPhoneNumber}
+            onChangeFormattedText={setFormattedValue}
+            containerStyle={[
+              styles.phoneInput,
+              errors.phoneNumber && { borderColor: "red" },
+            ]}
+            textContainerStyle={styles.textInput}
+            flagButtonStyle={styles.flagButton}
+            textInputProps={{ placeholder: "Phone number" }}
+            placeholderTextColor="#888"
           />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+          {errors.phoneNumber && (
+            <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+          )}
 
           <View style={styles.passwordInputContainer}>
             <CustomInput
@@ -130,7 +149,7 @@ const SignUpScreen = () => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
-              bordercolor={errors.password ? "red" : "#ccc"}
+              borderColor={errors.password ? "red" : "#ccc"}
               borderRadius={15}
               iconName="lock-closed"
               accessibilityLabel="Password input field"
@@ -153,7 +172,7 @@ const SignUpScreen = () => {
               value={passwordRepeat}
               onChangeText={setPasswordRepeat}
               secureTextEntry={!showPasswordRepeat}
-              bordercolor={errors.passwordRepeat ? "red" : "#ccc"}
+              borderColor={errors.passwordRepeat ? "red" : "#ccc"}
               borderRadius={15}
               iconName="lock-closed"
               accessibilityLabel="Confirm password input field"
@@ -180,10 +199,7 @@ const SignUpScreen = () => {
 
           <Text style={styles.text}>
             Already have an account?{" "}
-            <Text
-              style={styles.link}
-              onPress={() => navigation.navigate("LogIn")}
-            >
+            <Text style={styles.link} onPress={onLoginPressed}>
               Log in
             </Text>
           </Text>
@@ -221,17 +237,30 @@ const styles = StyleSheet.create({
   passwordInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 0,
+    marginBottom: 10,
   },
   eyeIcon: {
     marginLeft: -35,
-    marginTop: -10,
+    marginTop: 10,
     marginHorizontal: 10,
   },
   errorText: {
     color: "red",
     fontSize: 12,
     marginBottom: 15,
+  },
+  phoneInput: {
+    width: "100%",
+    height: 60,
+    borderColor: "#34D186",
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  textInput: {
+    borderRadius: 10,
+    paddingVertical: 0,
+    backgroundColor: "transparent",
   },
 });
 
