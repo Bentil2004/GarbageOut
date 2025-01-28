@@ -184,7 +184,7 @@ const AddScheduleScreen = ({ route }) => {
           ))}
         </ScrollView>
 
-        <TouchableOpacity style={styles.scheduleButton} onPress={() => navigation.navigate('Address')}>
+        <TouchableOpacity style={styles.scheduleButton} onPress={() => navigation.navigate('ScheduleConfirmation')}>
           <Text style={styles.scheduleButtonText}>Proceed</Text>
         </TouchableOpacity>
       </View>

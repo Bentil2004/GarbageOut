@@ -26,7 +26,7 @@ const ScheduleConfirmation = ({ route }) => {
 
   const onConfirmPayment = () => {
     setModalVisible(false);
-    navigation.navigate('Payment');
+    navigation.navigate("BottomTabNavigator",{screen: "Payment",});
   };
 
   return (
