@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 
 const PhoneNumberVerificationScreen = ({ route, navigation }) => {
-  const phoneNumber = route?.params?.phoneNumber || '+234 2449328934';
+  const phoneNumber = route?.params?.phoneNumber || ""; 
 
-  const [verificationCode, setVerificationCode] = useState(['', '', '', '']);
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +36,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     newVerificationCode[index] = value;
     setVerificationCode(newVerificationCode);
 
-    if (value !== '' && index < 3) {
+    if (value !== "" && index < 4) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -37,42 +44,44 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
   const handleVerifyCode = () => {
     setLoading(true);
 
-    const code = verificationCode.join('');
-    console.warn('Verification code entered:', code);
+    const code = verificationCode.join("");
+    console.warn("Verification code entered:", code);
 
     setTimeout(() => {
-      setLoading(false); 
-      navigation.navigate('LogIn');
+      setLoading(false);
+      navigation.navigate("LogIn");
     }, 1000);
   };
 
   const handleResend = () => {
-    console.warn('Resend verification code');
+    console.warn("Resend verification code");
     setTimer(60);
   };
 
   const onEditPressed = () => {
-    navigation.navigate('PhoneVerification');
+    navigation.navigate("SignUp");
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : null}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       <Text style={styles.title}>Enter code</Text>
-      <Text style={styles.subtitle}>An SMS code was sent to <Text style={styles.num}>{phoneNumber}</Text></Text>
+      <Text style={styles.subtitle}>
+        An SMS code was sent to <Text style={styles.num}>{phoneNumber}</Text>
+      </Text>
 
       <TouchableOpacity onPress={onEditPressed}>
         <Text style={styles.editNumberText}>Edit phone number</Text>
       </TouchableOpacity>
 
       <View style={styles.inputContainer}>
-        {[0, 1, 2, 3].map((index) => (
+        {verificationCode.map((_, index) => (
           <TextInput
             key={index}
-            ref={el => inputRefs.current[index] = el}
+            ref={(el) => (inputRefs.current[index] = el)}
             style={styles.input}
             keyboardType="number-pad"
             maxLength={1}
@@ -83,23 +92,24 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
       </View>
 
       <View style={styles.footer}>
-            <Text style={styles.timer}>
-                {timer === 0 ? (
-                <TouchableOpacity onPress={handleResend}>
-                    <Text style={styles.resendText}>Resend</Text>
-                </TouchableOpacity>
-                ) : (
-                `Resend code in ${timer} seconds`
-                )}
-            </Text>
-
-            <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
-                <Text style={styles.buttonText}>CONTINUE</Text>
+        <Text style={styles.timer}>
+          {timer === 0 ? (
+            <TouchableOpacity onPress={handleResend}>
+              <Text style={styles.resendText}>Resend</Text>
             </TouchableOpacity>
+          ) : (
+            `Resend code in ${timer} seconds`
+          )}
+        </Text>
+
+        <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
+          <Text style={styles.buttonText}>CONTINUE</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -130,14 +140,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   input: {
-    width: 74,
+    width: 64,
     height: 60, 
     fontSize: 24,
     textAlign: 'center',
     borderWidth: 2,
     borderColor: '#34D186',
     borderRadius: 10, 
-    marginHorizontal: 8, 
+    marginHorizontal: 3, 
     backgroundColor: '#f5f5f5',
   },
   timer: {
