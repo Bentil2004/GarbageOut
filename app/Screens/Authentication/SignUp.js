@@ -15,10 +15,10 @@ import CustomButton from "../../components/CustomButton";
 import PhoneInput from "react-native-phone-number-input";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
+import { BASE_URL } from "../../utils/config";
 
 const SignUpScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [formattedValue, setFormattedValue] = useState("");
   const [password, setPassword] = useState("");
   const [passwordRepeat, setPasswordRepeat] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +36,7 @@ const SignUpScreen = () => {
     let valid = true;
     let newErrors = {};
 
-    if (!formattedValue || formattedValue.length < 10) {
+    if (!phoneNumber || phoneNumber?.length !== 9) {
       newErrors.phoneNumber = "Please enter a valid phone number";
       valid = false;
     }
@@ -68,40 +68,70 @@ const SignUpScreen = () => {
   };
 
   const handleSignUp = async () => {
-    if (validateForm()) {
-      setLoading(true);
+  if (validateForm()) {
+    setLoading(true);
 
-      const data = {
-        phone_number: formattedValue,
-        password: password,
-      };
+    const data = {
+      phone: `+233${phoneNumber}`,
+      password: password,
+    };
 
-      try {
-        const response = await axios.post(
-          "https://garbageout.pythonanywhere.com/accounts/register/",
-          data
-        );
+    try {
+      console.log("Sending request:", data); // Debugging log
+      const url = `${BASE_URL}/register/`;
 
-        if (response.status === 201) {
-          Alert.alert(
-            "Success",
-            "Registration successful! Please verify your account."
-          );
-          navigation.navigate("Verification"); 
-        } else {
-          Alert.alert("Error", "Something went wrong. Please try again.");
-        }
-      } catch (error) {
-        if (error.response) {
-          Alert.alert("Error", error.response.data.message || "Failed to register.");
-        } else {
-          Alert.alert("Error", "Network error. Please check your connection.");
-        }
-      } finally {
-        setLoading(false);
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response:", responseData)
+        navigation.navigate("Verification", {phoneNumber});
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        Alert.alert("Error", errorData?.message || "Something went wrong.");
       }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+};
+
+
+  //const handleSignUp = async () => {
+  //  if (validateForm()) {
+  //    setLoading(true);
+  //
+  //    const data = {
+  //      phone: `+233${phoneNumber}`,
+  //      password: password
+  //    };
+  //        console.log(data)
+  //    //try {
+  //      const url = `${BASE_URL}/register/`
+  //      const response = await axios.post(url,data, {
+  //        headers :{
+  //          "Content-Type" : "application/json"
+  //        }
+  //      });
+  //      console.log(response)
+  //        //navigation.navigate("Verification"); 
+  //    //} catch (error) {
+  //      //console.error(error)
+  //    //} finally {
+  //      setLoading(false);
+  //    //}
+  //  }
+  //};
 
   const onLoginPressed = () => {
     navigation.navigate("LogIn");
@@ -129,7 +159,6 @@ const SignUpScreen = () => {
             defaultCode="GH"
             layout="first"
             onChangeText={setPhoneNumber}
-            onChangeFormattedText={setFormattedValue}
             containerStyle={[
               styles.phoneInput,
               errors.phoneNumber && { borderColor: "red" },
@@ -190,7 +219,7 @@ const SignUpScreen = () => {
           )}
 
           <CustomButton
-            text={loading ? "Processing..." : "Next"}
+            text={loading ? "Processing..." : "Submit"}
             onPress={handleSignUp}
             bg="#34D186"
             txt="white"

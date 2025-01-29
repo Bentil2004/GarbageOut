@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable , ScrollView} from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../context/UserContext';
 
 const Settings = () => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const { user, logout } = useUser();
 
   const onTermsPressed = () => {
     navigation.navigate('Terms');
@@ -33,7 +35,8 @@ const Settings = () => {
 
   const confirmLogout = () => {
     setModalVisible(false);
-   navigation.navigate('OnbordSignUp')
+    logout()
+   navigation.navigate('LogIn')
   };
 
   const cancelLogout = () => {
