@@ -6,6 +6,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 import DropDownPicker from 'react-native-dropdown-picker';
+// import Geolocation from '@react-native-community/geolocation';
 
 const bins = [
   { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
@@ -22,6 +23,8 @@ const AddScheduleScreen = ({ route }) => {
   const [quantities, setQuantities] = useState({});
   const [open, setOpen] = useState(false);  
   const [isModalVisible, setIsModalVisible] = useState(false); 
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const navigation = useNavigation();
 
   const locations = [
@@ -54,19 +57,36 @@ const AddScheduleScreen = ({ route }) => {
     });
   };
 
+
   const fetchCurrentLocation = () => {
     Geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        setLatitude(latitude);
+        setLongitude(longitude);
         setAddress(`Lat: ${latitude}, Lon: ${longitude}`);
-        setIsModalVisible(false);
+        console.log(JSON.stringify(latitude, longitude));
       },
       (error) => {
         console.error(error);
-        setIsModalVisible(false);
+        Alert.alert("Error", "Unable to fetch location.");
       }
     );
   };
+
+  // const fetchCurrentLocation = () => {
+  //   Geolocation.getCurrentPosition(
+  //     (position) => {
+  //       const { latitude, longitude } = position.coords;
+  //       setAddress(`Lat: ${latitude}, Lon: ${longitude}`);
+  //       setIsModalVisible(false);
+  //     },
+  //     (error) => {
+  //       console.error(error);
+  //       setIsModalVisible(false);
+  //     }
+  //   );
+  // };
 
   useEffect(() => {
     if (route.params?.confirmedAddress) {
@@ -239,6 +259,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 5,
   },
+  plusIconContainer: {
+    position: 'absolute',
+    right: -55, 
+    top: '30%',
+    transform: [{ translateY: -15 }],
+    // borderWidth: 1,
+    width: 50,
+    height: 50,
+    backgroundColor: '#7C6DDD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+  },
   checkboxContainer: {
     marginTop: 0,
     paddingHorizontal: 20,
@@ -383,19 +416,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 20,
   },
-  plusIconContainer: {
-    position: 'absolute',
-    right: -55, 
-    top: '30%',
-    transform: [{ translateY: -15 }],
-    // borderWidth: 1,
-    width: 50,
-    height: 50,
-    backgroundColor: '#7C6DDD',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -403,7 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: 300,
+    width: '80%',
     padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
