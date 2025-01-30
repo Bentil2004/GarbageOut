@@ -7,10 +7,13 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
+import { BASE_URL } from "../utils/config";
 
 const PhoneNumberVerificationScreen = ({ route, navigation }) => {
   const phoneNumber = route?.params?.phoneNumber || ""; 
+
 
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
@@ -39,19 +42,50 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     if (value !== "" && index < 4) {
       inputRefs.current[index + 1].focus();
     }
+    if(value == "" && index > 0){
+      inputRefs.current[index-1].focus()
+    }
   };
 
-  const handleVerifyCode = () => {
+
+  const handleVerifyCode = async () => {
     setLoading(true);
 
-    const code = verificationCode.join("");
-    console.warn("Verification code entered:", code);
+    const data = {
+      phone: `+233${phoneNumber}`,
+      code: verificationCode.join(""),
+    };
 
-    setTimeout(() => {
+    try {
+      console.log("Sending request:", data); // Debugging log
+      const url = `${BASE_URL}/verify-phone-number/`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response:", responseData)
+        Alert.alert("Success", "PhoneNumber verification successful. Proceed to login");
+        navigation.navigate("LogIn");
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        Alert.alert("Error", errorData.phone[0] || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
       setLoading(false);
-      navigation.navigate("LogIn");
-    }, 1000);
-  };
+    }
+};
+
 
   const handleResend = () => {
     console.warn("Resend verification code");
@@ -70,7 +104,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     >
       <Text style={styles.title}>Enter code</Text>
       <Text style={styles.subtitle}>
-        An SMS code was sent to <Text style={styles.num}>{phoneNumber}</Text>
+        An SMS code was sent to <Text style={styles.num}>{`+233${phoneNumber}`}</Text>
       </Text>
 
       <TouchableOpacity onPress={onEditPressed}>
@@ -102,8 +136,8 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
           )}
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleVerifyCode}>
-          <Text style={styles.buttonText}>CONTINUE</Text>
+        <TouchableOpacity disabled={loading} style={styles.button} onPress={handleVerifyCode}>
+          <Text style={styles.buttonText}>{loading ? "Processing..." : "Submit"}</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

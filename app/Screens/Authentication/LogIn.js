@@ -15,50 +15,79 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import PhoneInput from "react-native-phone-number-input";
 import { useNavigation } from "@react-navigation/native";
+import { BASE_URL } from "../../utils/config";
+import { useUser } from "../../context/UserContext";
 
 const { height } = Dimensions.get("window");
 
 const LogIn = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [formattedValue, setFormattedValue] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const { login } = useUser();
 
   const toggleVisibility = () => setShowPassword((prev) => !prev);
 
-  const validatePassword = (password) => password.length >= 8;
-
   const validateForm = () => {
-    let isValid = true;
+    let valid = true;
+    let newErrors = {};
 
-    if (!formattedValue || formattedValue.length < 10) {
-      Alert.alert("Error", "Please enter a valid phone number");
-      isValid = false;
+    if (!phoneNumber || phoneNumber?.length !== 9) {
+      newErrors.phoneNumber = "Please enter a valid phone number";
+      valid = false;
     }
 
-    if (!validatePassword(password)) {
-      setPasswordError("Password must be at least 8 characters long");
-      isValid = false;
-    } else {
-      setPasswordError("");
-    }
-
-    return isValid;
+    if (!password || password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+      valid = false;
+    } 
+    setErrors(newErrors);
+    return valid;
   };
 
-  const handleLogin = () => {
-    if (validateForm()) {
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-        Alert.alert("Success", "You have logged in successfully!");
+  const handleLogin = async () => {
+      if (validateForm()) {
+    setLoading(true);
+
+    const data = {
+      phone: `+233${phoneNumber}`,
+      password,
+    };
+
+    try {
+      console.log("Sending request:", data); // Debugging log
+      const url = `${BASE_URL}/token/`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+          login(responseData);
+        console.log("Response:", responseData)
         navigation.navigate("BottomTabNavigator");
-      }, 1000);
+      } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        Alert.alert("Error", errorData.phone[0] || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+};
+
 
   return (
     <KeyboardAvoidingView
@@ -66,7 +95,7 @@ const LogIn = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.root}>
+        <View style={styles.root} >
           <Image
             source={require("../../assets/Splash.jpeg")}
             style={styles.logo}
@@ -78,16 +107,18 @@ const LogIn = () => {
             defaultCode="GH"
             layout="first"
             onChangeText={setPhoneNumber}
-            onChangeFormattedText={setFormattedValue}
             containerStyle={[
               styles.phoneInput,
-              { borderColor: passwordError ? "red" : "#34D186" },
+              { borderColor: errors.phoneNumber ? "red" : "#34D186" },
             ]}
             textContainerStyle={styles.textInput}
             flagButtonStyle={styles.flagButton}
             textInputProps={{ placeholder: "Phone number" }}
             placeholderTextColor="#888"
           />
+          {errors.phoneNumber && (
+            <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+          )}
 
           <View style={styles.passwordContainer}>
             <CustomInput
@@ -95,7 +126,7 @@ const LogIn = () => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
-              borderColor={passwordError ? "red" : "#ccc"}
+              borderColor={errors.password ? "red" : "#ccc"}
               iconName="lock-closed"
             />
             <MaterialCommunityIcons
@@ -106,7 +137,7 @@ const LogIn = () => {
               onPress={toggleVisibility}
             />
           </View>
-          {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
           <Text
             style={styles.link}
@@ -181,7 +212,9 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    marginTop: 5,
+    fontSize: 12,
+    marginBottom: 15,
+    marginTop: 5
   },
   phoneInput: {
     width: "100%",
