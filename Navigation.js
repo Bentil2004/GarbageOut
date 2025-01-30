@@ -32,9 +32,9 @@ const Navigation = () => {
   return (
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Splash" component={Splash} />
-            <Stack.Screen name="LogIn" component={LogIn} />  
             <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
+            <Stack.Screen name="Splash" component={Splash} />
+            {/* <Stack.Screen name="LogIn" component={LogIn} />   */}
             <Stack.Screen name="Verification" component={Verification} />
             <Stack.Screen name="LogIn" component={LogIn} />  
             {/* <Stack.Screen name="OnbordSignUp" component={OnbordSignUp} /> */}
