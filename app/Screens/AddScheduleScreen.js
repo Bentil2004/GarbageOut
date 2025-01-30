@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, Image, ScrollView,
-  StyleSheet, Keyboard, TouchableWithoutFeedback,Modal
+  StyleSheet, Keyboard, TouchableWithoutFeedback, Modal,
+  Alert, ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from "@react-navigation/native";
 import DropDownPicker from 'react-native-dropdown-picker';
+import LocationButton from '../components/CustomButton/LocationButton';
+import { BASE_URL } from '../utils/config';
+import { useUser } from '../context/UserContext';
 
 const bins = [
   { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
@@ -16,18 +20,16 @@ const bins = [
 
 const AddScheduleScreen = ({ route }) => {
   const [repeatOption, setRepeatOption] = useState('');
-  const [address, setAddress] = useState('45 Kofi Annan St, Accra, Ghana');
-  const [locationName, setLocationName] = useState('');
+  const [address, setAddress] = useState({});
   const [selectedBins, setSelectedBins] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const [open, setOpen] = useState(false);  
-  const [isModalVisible, setIsModalVisible] = useState(false); 
+  const [open, setOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [pickUp, setPickUp] = useState([]);
   const navigation = useNavigation();
-
-  const locations = [
-    { label: 'Home', value: 'home' },
-    { label: 'Office', value: 'office' },
-  ];
+  const [loading, setLoading] = useState(false);
+  const {user} = useUser()
 
   const handleSelectBin = (id) => {
     if (!selectedBins.includes(id)) {
@@ -54,18 +56,66 @@ const AddScheduleScreen = ({ route }) => {
     });
   };
 
-  const fetchCurrentLocation = () => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setAddress(`Lat: ${latitude}, Lon: ${longitude}`);
+
+  const handleSubmit = async () => {
+    //if (!address?.coords) {
+    //  Alert.alert("Error", "Please get your location first.");
+    //  return;
+    //}
+
+    
+    const data = {
+      name: 'Home1',
+      latitude: address.coords.latitude,
+      longitude: address.coords.longitude      
+    };
+
+    console.log(data)
+
+    try {
+      setLoading(true)
+      const response = await fetch(`${BASE_URL}/create-pick-up-point/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${user?.access}` },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        await fetchPickup();
         setIsModalVisible(false);
-      },
-      (error) => {
-        console.error(error);
-        setIsModalVisible(false);
+      } else {
+        const errorData = await response.json();
+        console.log("Errordata",errorData)
+        Alert.alert("Error", errorData?.message || "Something went wrong.");
       }
-    );
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
+      console.log(error)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPickup = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/user-pick-up-points/`,
+        {
+          headers: {
+            "Authorization": `Bearer ${user?.access}`
+          }
+        }
+      );
+      if (!response.ok){
+        const errorData = await response.json();
+        console.log("Errordata",errorData)
+        Alert.alert("Error", errorData?.message || "Something went wrong.");
+      }
+      const data = await response.json();
+      setPickUp(data);
+      console.log(data)
+    } catch (error) {
+      console.error("Fetch pickup error:", error);
+    }
   };
 
   useEffect(() => {
@@ -74,26 +124,28 @@ const AddScheduleScreen = ({ route }) => {
     }
   }, [route.params?.confirmedAddress]);
 
+  useEffect(()=>{
+    fetchPickup()
+  },[])
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
         <Text style={styles.header}>Schedule new pickup</Text>
+
         <View style={styles.addressContainer}>
           <Text style={styles.sectionTitletop}>Please select an address</Text>
           <View style={styles.addressCard}>
             <DropDownPicker
               open={open}
-              value={locationName}
-              items={locations}
+              value={selectedLocation}
+              items={pickUp.map(item => ({ label: item.name, value: item.id }))}
               setOpen={setOpen}
-              setValue={setLocationName}
-              setItems={() => {}}
-              containerStyle={styles.dropdownContainer}
-              dropDownStyle={styles.dropDownStyle}
+              setValue={setSelectedLocation}
               placeholder="Select a location"
             />
-            <TouchableOpacity 
-              style={styles.plusIconContainer} 
+            <TouchableOpacity
+              style={styles.plusIconContainer}
               onPress={() => setIsModalVisible(true)}
             >
               <Icon name="add-circle-outline" size={30} color="#fff" />
@@ -110,23 +162,15 @@ const AddScheduleScreen = ({ route }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Please stand at the pickup point</Text>
-              <TouchableOpacity 
-                style={styles.modalButton} 
-                onPress={fetchCurrentLocation} 
-              >
-                <Text style={styles.modalButtonText}>Get My Location</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.modalButton} 
-                onPress={() => setIsModalVisible(false)} 
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
+              <LocationButton setUserLocation={setAddress} />
+              <TouchableOpacity style={styles.modalButton} onPress={()=> handleSubmit()}>
+                <Text style={styles.modalButtonText}>{loading?"Submitting...":"Submit"}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
-        <View style={styles.checkboxContainer}>
+       <View style={styles.checkboxContainer}>
           <Text style={styles.sectionTitlemid}>Duration For Pickup</Text>
           {['Daily', 'Weekly', 'Twice Weekly'].map((option, index) => (
             <TouchableOpacity
@@ -188,11 +232,12 @@ const AddScheduleScreen = ({ route }) => {
           <Text style={styles.scheduleButtonText}>Proceed</Text>
         </TouchableOpacity>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableWithoutFeedback> 
   );
 };
 
 export default AddScheduleScreen;
+
 
 const styles = StyleSheet.create({
   container: {
