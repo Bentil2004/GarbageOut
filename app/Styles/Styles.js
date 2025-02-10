@@ -297,11 +297,14 @@ export const ScheduleScreen = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     paddingTop: 50,
-    paddingHorizontal: 25,
+    paddingHorizontal: 15,
   },
   addressContainer: {
     paddingHorizontal: 10,
     marginBottom: 10,
+  },
+  address: {
+    borderColor: '#ccc',
   },
   addressCard: {
     backgroundColor: 'white',
@@ -342,9 +345,10 @@ export const ScheduleScreen = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+    marginLeft : 20,
   },
   checkboxText: {
-    marginLeft: 10,
+    marginLeft: 20,
     fontSize: 16,
     color: '#000',
   },
@@ -361,7 +365,7 @@ export const ScheduleScreen = StyleSheet.create({
   binListContainer: {
     maxHeight: 320,
     paddingHorizontal: 20,
-    marginBottom: 30,
+    marginBottom: 200,
   },
   binContainer: {
     flexDirection: 'row',
@@ -398,18 +402,18 @@ export const ScheduleScreen = StyleSheet.create({
   },
   closeButton: {
     position: 'absolute',
-    top: -65,
+    top: -35,
     right: 5,
     padding: 5,
-    backgroundColor: '#000',
+    backgroundColor: '#777',
     borderRadius: 15,
     width: 25,
     height: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 1,
+    // shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.1,
+    shadowRadius: 3,
+    // elevation: 1,
   },
   closeButtonText: {
     color: '#fff',
@@ -420,8 +424,9 @@ export const ScheduleScreen = StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    color: '#34D186',
+    color: 'red',
     fontWeight: 'bold',
+    marginTop: 10,
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -448,7 +453,8 @@ export const ScheduleScreen = StyleSheet.create({
     paddingVertical: 15,
     marginHorizontal: 20,
     borderRadius: 10,
-    marginTop: 5,
+    // marginTop: 15,
+    marginBottom: 30,
   },
   scheduleButtonText: {
     color: 'white',
@@ -487,6 +493,9 @@ export const ScheduleScreen = StyleSheet.create({
     marginBottom: 10,
     marginHorizontal: 20,
   },
+  scrollview:{
+    // marginBottom: 530,
+  },
   plusIconContainer: {
     position: 'absolute',
     right: -55, 
@@ -524,7 +533,7 @@ export const ScheduleScreen = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 35,
     borderRadius: 5,
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   modalButtonText: {
     color: 'white',
@@ -536,5 +545,33 @@ export const ScheduleScreen = StyleSheet.create({
     marginBottom: 10,
     marginTop: 30,
     width: '90%',
+  },
+  datePickerContainer: {
+    marginTop: 5,
+    padding: 10,
+    // backgroundColor: '#F0F0F0',
+    borderRadius: 10,
+  },
+  dateText: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 5,
+    fontWeight: 'bold',
+    marginLeft: -25,
+  },
+  inputContainer: {
+    marginTop: 5,
+    marginBottom: 10,
+    padding: 10,
+    // backgroundColor: '#F0F0F0',
+    borderRadius: 10,
+  },
+  generatedDateText:{
+    fontSize: 14,
+    color: 'red',
+    marginBottom: 5,
+    fontWeight: 'bold',
+    marginLeft: 15
+  ,
   }
 });

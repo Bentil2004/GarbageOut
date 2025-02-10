@@ -11,7 +11,7 @@ const LocationButton = ({ setUserLocation }) => {
     setLoading(true);
 
     try {
-      // Request permission
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission Denied", "Location access is required.");
@@ -19,7 +19,6 @@ const LocationButton = ({ setUserLocation }) => {
         return;
       }
 
-       // Get current location with high accuracy
       let userLocation = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Highest,
       });
