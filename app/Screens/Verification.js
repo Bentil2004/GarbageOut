@@ -58,7 +58,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
 
     try {
       console.log("Sending request:", data); // Debugging log
-      const url = `${BASE_URL}/verify-phone-number/`;
+      const url = `${BASE_URL}accounts/verify-phone-number/`;
 
       const response = await fetch(url, {
         method: "POST",

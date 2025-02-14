@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  View, Text, TouchableOpacity, Image, ScrollView,
-  StyleSheet, Keyboard, TouchableWithoutFeedback, Modal,
-  Alert, ActivityIndicator
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Modal,
+  Alert,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
-import DropDownPicker from 'react-native-dropdown-picker';
-import LocationButton from '../components/CustomButton/LocationButton';
-import { BASE_URL } from '../utils/config';
-import { useUser } from '../context/UserContext';
-
-const bins = [
-  { id: 1, name: 'Small', size: '140 litre bin', bags: '2 full black bags', price: 30 },
-  { id: 2, name: 'Standard', size: '140 litre bin', bags: '3 full black bags', price: 60 },
-  { id: 3, name: 'Large', size: '140 litre bin', bags: '4-5 full black bags', price: 70 },
-  { id: 4, name: 'Extra Large', size: '140 litre bin', bags: '6-8 full black bags', price: 100 },
-];
+import DropDownPicker from "react-native-dropdown-picker";
+import LocationButton from "../components/CustomButton/LocationButton";
+import { useUser } from "../context/UserContext";
+import { ScheduleScreen } from "../Styles/Styles";
+import { BASE_URL } from "../utils/config";
 
 const AddScheduleScreen = ({ route }) => {
-  const [repeatOption, setRepeatOption] = useState('');
+  const [repeatOption, setRepeatOption] = useState("");
   const [address, setAddress] = useState({});
   const [selectedBins, setSelectedBins] = useState([]);
   const [quantities, setQuantities] = useState({});
@@ -27,13 +27,34 @@ const AddScheduleScreen = ({ route }) => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [pickUp, setPickUp] = useState([]);
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const {user} = useUser()
+  const [loadingBins, setLoadingBins] = useState(false);
+  const [name, setName] = useState("");
+  const { user } = useUser();
+  const [bins, setBins] = useState([]);
+  const [durations, setDurations] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [inputValues, setInputValues] = useState([]);
+  const [locationId, setLocationId] = useState(null);
+  const [subscriptionId, setSubscriptionId] = useState(null);
+
+  const navigation = useNavigation();
 
   const handleSelectBin = (id) => {
-    if (!selectedBins.includes(id)) {
-      setSelectedBins([...selectedBins, id]);
+    setSelectedBins((prevSelectedBins) => {
+      console.log(prevSelectedBins);
+      const binExists = prevSelectedBins.some((bin) => bin.trash_bin === id);
+
+      if (!binExists) {
+        return [
+          ...prevSelectedBins,
+          { trash_bin: id, number_of_trash_bins: quantities[id] || 1 },
+        ];
+      }
+      return prevSelectedBins;
+    });
+
+    if (!quantities[id]) {
       setQuantities((prevQuantities) => ({ ...prevQuantities, [id]: 1 }));
     }
   };
@@ -41,14 +62,35 @@ const AddScheduleScreen = ({ route }) => {
   const handleQuantityChange = (id, type) => {
     setQuantities((prevQuantities) => {
       const currentQuantity = prevQuantities[id] || 1;
-      if (type === 'increase') return { ...prevQuantities, [id]: currentQuantity + 1 };
-      else if (type === 'decrease' && currentQuantity > 1) return { ...prevQuantities, [id]: currentQuantity - 1 };
-      return prevQuantities;
+      let newQuantity = currentQuantity;
+
+      if (type === "increase") {
+        newQuantity = currentQuantity + 1;
+      } else if (type === "decrease" && currentQuantity > 1) {
+        newQuantity = currentQuantity - 1;
+      }
+
+      setSelectedBins((prevSelectedBins) => {
+        return prevSelectedBins.map((bin) => {
+          if (bin.trash_bin === id) {
+            return { ...bin, number_of_trash_bins: newQuantity };
+          }
+          return bin;
+        });
+      });
+
+      return { ...prevQuantities, [id]: newQuantity };
     });
   };
 
+
+  
+  // Handle bin removal (deletion)
   const handleCloseBin = (id) => {
-    setSelectedBins(selectedBins.filter(binId => binId !== id));
+    setSelectedBins((prevSelectedBins) => {
+      return prevSelectedBins.filter((bin) => bin.trash_bin !== id);
+    });
+
     setQuantities((prevQuantities) => {
       const updatedQuantities = { ...prevQuantities };
       delete updatedQuantities[id];
@@ -56,67 +98,132 @@ const AddScheduleScreen = ({ route }) => {
     });
   };
 
+  const trashBins = selectedBins.map((bin) => ({
+    trash_bin: bin.trash_bin,
+    number_of_trash_bins: bin.number_of_trash_bins,
+  }));
 
-  const handleSubmit = async () => {
-    //if (!address?.coords) {
-    //  Alert.alert("Error", "Please get your location first.");
-    //  return;
-    //}
-
-    
+  // Submit Schedule to backend
+  const submitSchedule = () => {
     const data = {
-      name: 'Home1',
-      latitude: address.coords.latitude,
-      longitude: address.coords.longitude      
+      location: selectedLocation.id,
+      subscription: selectedOption.subscription_id,
+      trash_bins: trashBins.length > 0 ? trashBins : null,
     };
+  };
 
-    console.log(data)
-
+  // Fetch pickup points
+  const fetchPickup = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`${BASE_URL}/create-pick-up-point/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${user?.access}` },
-        body: JSON.stringify(data),
+      const response = await fetch(`${BASE_URL}accounts/user-pick-up-points/`, {
+        headers: {
+          Authorization: `Bearer ${user?.access}`,
+        },
       });
 
-      if (response.ok) {
-        await fetchPickup();
-        setIsModalVisible(false);
-      } else {
+      if (!response.ok) {
         const errorData = await response.json();
-        console.log("Errordata",errorData)
         Alert.alert("Error", errorData?.message || "Something went wrong.");
       }
+
+      const data = await response.json();
+      setPickUp(data);
     } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
-      console.log(error)
+      console.error("Fetch pickup error:", error);
+    }
+  };
+
+  // Fetch bins
+  const fetchBins = async () => {
+    setLoadingBins(true);
+    try {
+      const response = await fetch(`${BASE_URL}core/bins`);
+      const data = await response.json();
+      setBins(data);
+    } catch (error) {
+      console.error("Error fetching bins:", error.message);
+    } finally {
+      setLoadingBins(false);
+    }
+  };
+
+  // Fetch durations
+  const fetchDurations = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${BASE_URL}core/subscriptions`);
+      const data = await response.json();
+
+      const mappedDurations = data.map((d) => {
+        return {
+          subscription_id: d.subscription_id,
+          subscription_name: d.subscription_name,
+          per_month: d.per_month,
+          schedules: d.schedules,
+        };
+      });
+
+      setDurations(mappedDurations);
+    } catch (error) {
+      console.error("Error fetching durations:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchPickup = async () => {
+  const handleSubmit = async () => {
+    if (!address?.coords) {
+      Alert.alert("Error", "Please get your location first.");
+      return;
+    }
+
+    const data = {
+      name,
+      latitude: address.coords.latitude,
+      longitude: address.coords.longitude,
+    };
+
     try {
-      const response = await fetch(`${BASE_URL}/user-pick-up-points/`,
+      setLoading(true);
+      const response = await fetch(
+        `${BASE_URL}accounts/create-pick-up-point/`,
         {
+          method: "POST",
           headers: {
-            "Authorization": `Bearer ${user?.access}`
-          }
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.access}`,
+          },
+          body: JSON.stringify(data),
         }
       );
-      if (!response.ok){
+
+      if (response.ok) {
+        await fetchPickup();
+        setIsModalVisible(false);
+        setSelectedLocation(name);
+        setName("");
+      } else {
         const errorData = await response.json();
-        console.log("Errordata",errorData)
         Alert.alert("Error", errorData?.message || "Something went wrong.");
       }
-      const data = await response.json();
-      setPickUp(data);
-      console.log(data)
     } catch (error) {
-      console.error("Fetch pickup error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleOptionSelect = (option) => {
+    console.log(option);
+    setSelectedOption(option);
+    setInputValues(Array(option.per_month).fill(""));
+  };
+
+  useEffect(() => {
+    fetchPickup();
+    fetchDurations();
+    fetchBins();
+  }, []);
 
   useEffect(() => {
     if (route.params?.confirmedAddress) {
@@ -124,13 +231,27 @@ const AddScheduleScreen = ({ route }) => {
     }
   }, [route.params?.confirmedAddress]);
 
-  useEffect(()=>{
-    fetchPickup()
-  },[])
+  const getOrdinalSuffix = (day) => {
+    if (day >= 11 && day <= 13) {
+      return "th";
+    }
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
 
+
+  
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollview}>
         <Text style={styles.header}>Schedule new pickup</Text>
 
         <View style={styles.addressContainer}>
@@ -138,8 +259,12 @@ const AddScheduleScreen = ({ route }) => {
           <View style={styles.addressCard}>
             <DropDownPicker
               open={open}
+              style={styles.address}
               value={selectedLocation}
-              items={pickUp.map(item => ({ label: item.name, value: item.id }))}
+              items={pickUp.map((item) => ({
+                label: item.name,
+                value: item.id,
+              }))}
               setOpen={setOpen}
               setValue={setSelectedLocation}
               placeholder="Select a location"
@@ -153,6 +278,7 @@ const AddScheduleScreen = ({ route }) => {
           </View>
         </View>
 
+
         <Modal
           visible={isModalVisible}
           transparent={true}
@@ -161,314 +287,157 @@ const AddScheduleScreen = ({ route }) => {
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Please stand at the pickup point</Text>
+              <Text style={styles.modalTitle}>
+                Please stand at the pickup point
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Please choose a name"
+                value={name}
+                onChangeText={setName}
+              />
               <LocationButton setUserLocation={setAddress} />
-              <TouchableOpacity style={styles.modalButton} onPress={()=> handleSubmit()}>
-                <Text style={styles.modalButtonText}>{loading?"Submitting...":"Submit"}</Text>
-              </TouchableOpacity>
+              <View style={styles.ModalSubCancel}>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={() => setIsModalVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.modalButtonText}>
+                    {loading ? "Submitting..." : "Submit"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>
 
-       <View style={styles.checkboxContainer}>
-          <Text style={styles.sectionTitlemid}>Duration For Pickup</Text>
-          {['Daily', 'Weekly', 'Twice Weekly'].map((option, index) => (
+
+
+
+
+
+
+
+
+
+
+
+        <Text style={styles.sectionTitledown}>Duration for Pickup</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color="#7C6DDD" />
+        ) : (
+          durations.map((option, index) => (
             <TouchableOpacity
               key={index}
               style={styles.checkboxRow}
-              onPress={() => setRepeatOption(option)}
+              onPress={() => handleOptionSelect(option)}
             >
               <Icon
-                name={repeatOption === option ? "radio-button-on" : "radio-button-off"}
+                name={
+                  selectedOption?.subscription_id === option.subscription_id
+                    ? "radio-button-on"
+                    : "radio-button-off"
+                }
                 size={20}
                 color="#7C6DDD"
               />
-              <Text style={styles.checkboxText}>{option}</Text>
+              <Text style={styles.checkboxText}>
+                {option.subscription_name}
+                {option.schedules && option.schedules.length > 0 && (
+                  <Text style={styles.scheduleDatesText}>
+                    {" on "}
+                    {option.schedules.map((schedule, idx) => (
+                      <Text key={schedule.id}>
+                        {schedule.day_of_the_month}
+                        {getOrdinalSuffix(schedule.day_of_the_month)}
+                        {idx < option.schedules.length - 1 ? ", " : ""}
+                      </Text>
+                    ))}
+                  </Text>
+                )}
+              </Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          ))
+        )}
+
+
+
+
+
+
+
+
 
         <Text style={styles.sectionTitledown}>Size of Bin</Text>
-        <Text style={styles.sectionSubtext}>Please select the bin size</Text>
+        <Text style={styles.sectionSubtext}>Please select the bin size:</Text>
 
-        <ScrollView style={styles.binListContainer}>
-          {bins.map((bin) => (
-            <TouchableOpacity
-              key={bin.id}
-              style={[
-                styles.binContainer,
-                selectedBins.includes(bin.id) && styles.selectedBin,
-              ]}
-              onPress={() => handleSelectBin(bin.id)}
-            >
-              <Image source={require('../assets/Bin2.jpeg')} style={styles.binImage} />
-              <View style={styles.binDetails}>
-                <Text style={styles.binName}>{bin.name}</Text>
-                <Text style={styles.binSize}>{bin.size}</Text>
-                <Text style={styles.binBags}>{bin.bags}</Text>
-                {selectedBins.includes(bin.id) && (
-                  <>
-                    <Text style={styles.price}>${bin.price * quantities[bin.id]}</Text>
+        {loadingBins ? (
+          <ActivityIndicator size="medium" color="#7C6DDD" />
+        ) : (
+          <View style={styles.binListContainer}>
+            {bins.map((bin) => (
+              <TouchableOpacity
+                key={bin.id}
+                style={[
+                  styles.binContainer,
+                  selectedBins.some(binGroup => binGroup.trash_bin === bin.id) && styles.selectedBin,
+                ]}
+                onPress={() => handleSelectBin(bin.id)}
+              >
+                <Image
+                  source={require("../assets/Bin2.jpeg")}
+                  style={styles.binImage}
+                />
+                <View style={styles.binDetails}>
+                  <Text style={styles.binName}>Bin Size: {bin.size}</Text>
+                  <Text style={styles.price}>
+                    GHC {bin.price * (quantities[bin.id] || 1)}
+                  </Text>
+                  {selectedBins.some(binGroup => binGroup.trash_bin === bin.id) && (
                     <View style={styles.quantityContainer}>
-                      <TouchableOpacity onPress={() => handleQuantityChange(bin.id, 'decrease')}>
+                      <TouchableOpacity
+                        onPress={() => handleQuantityChange(bin.id, "decrease")}
+                      >
                         <Text style={styles.quantityButton}>-</Text>
                       </TouchableOpacity>
-                      <Text style={styles.quantityText}>{quantities[bin.id]}</Text>
-                      <TouchableOpacity onPress={() => handleQuantityChange(bin.id, 'increase')}>
+                      <Text style={styles.quantityText}>
+                        {quantities[bin.id]}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleQuantityChange(bin.id, "increase")}
+                      >
                         <Text style={styles.quantityButton}>+</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity onPress={() => handleCloseBin(bin.id)} style={styles.closeButton}>
+                      <TouchableOpacity
+                        onPress={() => handleCloseBin(bin.id)}
+                        style={styles.closeButton}
+                      >
                         <Text style={styles.closeButtonText}>X</Text>
                       </TouchableOpacity>
                     </View>
-                  </>
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </ScrollView>
 
-        <TouchableOpacity style={styles.scheduleButton} onPress={() => navigation.navigate('ScheduleConfirmation')}>
-          <Text style={styles.scheduleButtonText}>Proceed</Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback> 
+
+
+      <TouchableOpacity style={styles.scheduleButton} onPress={submitSchedule}>
+        <Text style={styles.scheduleButtonText}>Proceed to Submit</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 export default AddScheduleScreen;
 
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingTop: 50,
-    paddingHorizontal: 25,
-  },
-  addressContainer: {
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  addressCard: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    width: 300,
-    position: 'relative',
-  },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 10,
-    marginHorizontal: 10,
-  },
-  locationInput: {
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    flex: 1,
-    borderRadius: 10,
-    height: 40,
-  },
-  dropDownStyle: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  checkboxContainer: {
-    marginTop: 0,
-    paddingHorizontal: 20,
-    marginHorizontal: 10,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkboxText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#000',
-  },
-  binListContainer: {
-    maxHeight: 320,
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  binContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-  },
-  selectedBin: {
-    borderColor: '#34D186',
-    borderWidth: 2,
-  },
-  binImage: {
-    width: 50,
-    height: 50,
-    marginRight: 15,
-  },
-  binDetails: {
-    flex: 1,
-  },
-  binName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  binSize: {
-    fontSize: 14,
-    color: '#555',
-  },
-  binBags: {
-    fontSize: 12,
-    color: '#777',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: -65,
-    right: 5,
-    padding: 5,
-    backgroundColor: '#000',
-    borderRadius: 15,
-    width: 25,
-    height: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 12,
-    textAlign: 'center',
-    justifyContent: 'center',
-  },
-  price: {
-    fontSize: 14,
-    color: '#34D186',
-    fontWeight: 'bold',
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  quantityButton: {
-    fontSize: 10,
-    padding: 10,
-    backgroundColor: '#5555',
-    textAlign: 'center',
-    borderRadius: 5,
-  },
-  quantityText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginHorizontal: 10,
-  },
-  scheduleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#7C6DDD',
-    paddingVertical: 15,
-    marginHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  scheduleButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  sectionTitletop: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginTop: 20,
-    marginBottom: 10,
-    marginHorizontal: 5,
-  },
-  sectionSubtext: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 1,
-    marginBottom: 5,
-    marginHorizontal: 20,
-  },
-  sectionTitlemid: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginTop: 20,
-    marginBottom: 10,
-    marginHorizontal: -5,
-  },
-  sectionTitledown: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginTop: 20,
-    marginBottom: 10,
-    marginHorizontal: 20,
-  },
-  plusIconContainer: {
-    position: 'absolute',
-    right: -55, 
-    top: '30%',
-    transform: [{ translateY: -15 }],
-    // borderWidth: 1,
-    width: 50,
-    height: 50,
-    backgroundColor: '#7C6DDD',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: 'red',
-  },
-  modalButton: {
-    backgroundColor: '#7C6DDD',
-    paddingVertical: 10,
-    paddingHorizontal: 40,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-});
+const styles = ScheduleScreen;

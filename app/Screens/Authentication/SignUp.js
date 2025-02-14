@@ -14,7 +14,7 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import PhoneInput from "react-native-phone-number-input";
 import { useNavigation } from "@react-navigation/native";
-import axios from "axios";
+// import axios from "axios";
 import { BASE_URL } from "../../utils/config";
 
 const SignUpScreen = () => {
@@ -78,7 +78,7 @@ const SignUpScreen = () => {
 
     try {
       console.log("Sending request:", data); // Debugging log
-      const url = `${BASE_URL}/register/`;
+      const url = `${BASE_URL}accounts/register/`;
 
       const response = await fetch(url, {
         method: "POST",

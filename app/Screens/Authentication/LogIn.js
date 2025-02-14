@@ -59,7 +59,7 @@ const LogIn = () => {
 
     try {
       console.log("Sending request:", data); // Debugging log
-      const url = `${BASE_URL}/token/`;
+      const url = `${BASE_URL}accounts/token/`;
 
       const response = await fetch(url, {
         method: "POST",
