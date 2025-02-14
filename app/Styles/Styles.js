@@ -190,6 +190,7 @@ export const SchedulePage = StyleSheet.create({
   },
   notificationIcon: {
     color: 'white',
+    paddingTop: 10
   },
   sectionTitle: {
     fontSize: 18,
@@ -240,7 +241,7 @@ export const SchedulePage = StyleSheet.create({
   binPrice: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: 'red',
+    color: '#34D186',
     marginTop: 6,
   },
   scrollContainer: {

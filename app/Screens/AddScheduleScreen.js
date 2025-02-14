@@ -18,26 +18,29 @@ import LocationButton from "../components/CustomButton/LocationButton";
 import { useUser } from "../context/UserContext";
 import { ScheduleScreen } from "../Styles/Styles";
 import { BASE_URL } from "../utils/config";
+import { usePickupPoints } from "../context/PickupPointsContext";
+import { useSubscriptions } from "../context/SubscriptionsContext";
+import { useBins } from "../context/BinsContext";
 
 const AddScheduleScreen = ({ route }) => {
-  const [repeatOption, setRepeatOption] = useState("");
+  //const [repeatOption, setRepeatOption] = useState("");
   const [address, setAddress] = useState({});
   const [selectedBins, setSelectedBins] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [open, setOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [pickUp, setPickUp] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading1, setIsLoading1] = useState(false);
   const [loadingBins, setLoadingBins] = useState(false);
   const [name, setName] = useState("");
   const { user } = useUser();
-  const [bins, setBins] = useState([]);
-  const [durations, setDurations] = useState([]);
+  const {pickupPoints, setPickupPoints} = usePickupPoints()
+  const { subscriptions, setSubscriptions } = useSubscriptions()
+  const {bins, setBins} = useBins()
   const [selectedOption, setSelectedOption] = useState(null);
   const [inputValues, setInputValues] = useState([]);
-  const [locationId, setLocationId] = useState(null);
-  const [subscriptionId, setSubscriptionId] = useState(null);
 
   const navigation = useNavigation();
 
@@ -48,7 +51,7 @@ const AddScheduleScreen = ({ route }) => {
       if (!binExists) {
         return [
           ...prevSelectedBins,
-          { trash_bin: id, number_of_trash_bins: quantities[id] || 1 },
+          { trash_bin: id, number_of_trash_bins: 1 },
         ];
       }
       return prevSelectedBins;
@@ -117,17 +120,22 @@ const AddScheduleScreen = ({ route }) => {
       return;
     }
 
+    if (trashBins.length == 0) {
+      Alert.alert("Error", "Please select trash bins.");
+      return;
+    }
+
     const data = {
       subscription: selectedOption.subscription_id,
       location: selectedLocation,
       trash_bins: trashBins.length > 0 ? trashBins : null,
     };
 
-    console.log("backend data:", JSON.stringify(data, null, 2));
 
     try {
-      setLoading(true);
-      const response = await fetch(`${BASE_URL}schedules/schedule-pickup/create`, {
+      setIsLoading1(true);
+          console.log("backend data:", JSON.stringify(data), user?.access);
+      const response = await fetch(`${BASE_URL}schedules/schedule-pickup/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,15 +146,19 @@ const AddScheduleScreen = ({ route }) => {
 
       if (response.ok) {
         Alert.alert("Success", "Schedule submitted successfully!");
-        navigation.navigate("ScheduleConfirmation");
+        const data = await response.json();
+        console.log(data)
+        navigation.navigate("ScheduleConfirmation", data);
       } else {
         const errorData = await response.json();
+        console.error(errorData)
         Alert.alert("Error", errorData?.message || "Something went wrong.");
       }
     } catch (error) {
       Alert.alert("Error", "Something went wrong. Please try again.");
+      console.error(error)
     } finally {
-      setLoading(false);
+      setIsLoading1(false);
     }
   };
 
@@ -164,11 +176,11 @@ const AddScheduleScreen = ({ route }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        Alert.alert("Error", errorData?.message || "Something went wrong.");
+        Alert.alert("Error", errorData?.message || "Something went wrong fetching pickup points.");
       }
 
       const data = await response.json();
-      setPickUp(data);
+      setPickupPoints(data);
     } catch (error) {
       console.error("Fetch pickup error:", error);
     }
@@ -178,7 +190,7 @@ const AddScheduleScreen = ({ route }) => {
   const fetchBins = async () => {
     setLoadingBins(true);
     try {
-      const response = await fetch(`${BASE_URL}core/bins`);
+      const response = await fetch(`${BASE_URL}core/bins/`);
       const data = await response.json();
       setBins(data);
     } catch (error) {
@@ -192,21 +204,11 @@ const AddScheduleScreen = ({ route }) => {
   const fetchDurations = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}core/subscriptions`);
+      const response = await fetch(`${BASE_URL}core/subscriptions/`);
       const data = await response.json();
-
-      const mappedDurations = data.map((d) => {
-        return {
-          subscription_id: d.subscription_id,
-          subscription_name: d.subscription_name,
-          per_month: d.per_month,
-          schedules: d.schedules,
-        };
-      });
-
-      setDurations(mappedDurations);
+      setSubscriptions(data)
     } catch (error) {
-      console.error("Error fetching durations:", error);
+      console.error("Error fetching subscriptions:", error);
     } finally {
       setLoading(false);
     }
@@ -219,6 +221,10 @@ const AddScheduleScreen = ({ route }) => {
       Alert.alert("Error", "Please get your location first.");
       return;
     }
+    if (!name) {
+      Alert.alert("Error", "Please enter your location name.");
+      return;
+    }
 
     const data = {
       name,
@@ -227,7 +233,7 @@ const AddScheduleScreen = ({ route }) => {
     };
 
     try {
-      setLoading(true);
+      setIsLoading(true);
       const response = await fetch(
         `${BASE_URL}accounts/create-pick-up-point/`,
         {
@@ -245,14 +251,17 @@ const AddScheduleScreen = ({ route }) => {
         setIsModalVisible(false);
         setSelectedLocation(name);
         setName("");
-      } else {
+      }
+      else {
         const errorData = await response.json();
-        Alert.alert("Error", errorData?.message || "Something went wrong.");
+                console.error(errorData)
+        Alert.alert("Error", errorData?.message || "Something went wrong!.");
       }
     } catch (error) {
       Alert.alert("Error", "Something went wrong. Please try again.");
+      console.error(error)
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -299,15 +308,15 @@ const AddScheduleScreen = ({ route }) => {
         <Text style={styles.header}>Schedule new pickup</Text>
 
         <View style={styles.addressContainer}>
-          <Text style={styles.sectionTitletop}>Please select an address</Text>
+          <Text style={styles.sectionTitletop}>Please select a location </Text>
           <View style={styles.addressCard}>
             <DropDownPicker
               open={open}
               style={styles.address}
               value={selectedLocation}
-              items={pickUp.map((item) => ({
-                label: item.name,
-                value: item.id,
+              items={pickupPoints?.map((item) => ({
+                label: item?.name,
+                value: item?.id,
               }))}
               setOpen={setOpen}
               setValue={setSelectedLocation}
@@ -336,9 +345,10 @@ const AddScheduleScreen = ({ route }) => {
               <Text style={styles.modalTitle}>
                 Please stand at the pickup point
               </Text>
+              <Text style={{textAlign:'left', width: '100%', fontWeight: 'bold', marginBottom: 5}}>Location name: </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Please choose a name"
+                placeholder="Enter your location name"
                 value={name}
                 onChangeText={setName}
               />
@@ -355,7 +365,7 @@ const AddScheduleScreen = ({ route }) => {
                   onPress={handleSubmit}
                 >
                   <Text style={styles.modalButtonText}>
-                    {loading ? "Submitting..." : "Submit"}
+                    {isLoading ? "Submitting..." : "Submit"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -367,11 +377,11 @@ const AddScheduleScreen = ({ route }) => {
 
 
 
-        <Text style={styles.sectionTitledown}>Duration for Pickup</Text>
-        {loading ? (
+        <Text style={styles.sectionTitledown}>Subscription for Pickup</Text>
+        {loading && subscriptions?.length == 0 ? (
           <ActivityIndicator size="small" color="#7C6DDD" />
         ) : (
-          durations.map((option, index) => (
+          subscriptions?.map((option, index) => (
             <TouchableOpacity
               key={index}
               style={styles.checkboxRow}
@@ -388,7 +398,7 @@ const AddScheduleScreen = ({ route }) => {
               />
               <Text style={styles.checkboxText}>
                 {option.subscription_name}
-                {option.schedules && option.schedules.length > 0 && (
+                  {/* {option.schedules && option.schedules.length > 0 && (
                   <Text style={styles.scheduleDatesText}>
                     {" on "}
                     {option.schedules.map((schedule, idx) => (
@@ -399,7 +409,7 @@ const AddScheduleScreen = ({ route }) => {
                       </Text>
                     ))}
                   </Text>
-                )}
+                )} */}
               </Text>
             </TouchableOpacity>
           ))
@@ -416,7 +426,7 @@ const AddScheduleScreen = ({ route }) => {
         <Text style={styles.sectionTitledown}>Size of Bin</Text>
         <Text style={styles.sectionSubtext}>Please select the bin size:</Text>
 
-        {loadingBins ? (
+        {loadingBins && bins?.length == 0 ? (
           <ActivityIndicator size="medium" color="#7C6DDD" />
         ) : (
           <View style={styles.binListContainer}>
@@ -473,7 +483,7 @@ const AddScheduleScreen = ({ route }) => {
       </ScrollView>
 
       <TouchableOpacity style={styles.scheduleButton} onPress={submitSchedule}>
-        <Text style={styles.scheduleButtonText}>Proceed to Submit</Text>
+        <Text style={styles.scheduleButtonText}>{isLoading1 ? "Submitting..." : "Proceed to Submit"}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -1,23 +1,21 @@
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Modal, Pressable } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { usePickupPoints } from '../context/PickupPointsContext';
+import { useSubscriptions } from '../context/SubscriptionsContext';
+import { useBins } from '../context/BinsContext';
 
 const ScheduleConfirmation = ({ route }) => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const {pickupPoints} = usePickupPoints()
+  const { subscriptions } = useSubscriptions()
+  const { bins } = useBins()
 
-  const { locationName, coordinates, duration, bins } = route.params || {
-    locationName: 'Home',
-    coordinates: 'Accra Newtown 555',
-    duration: 'Repeat Daily',
-    bins: [
-      { size: '40 Litres', bags: '2 full black bags', price: 100, quantity: 1 },
-      // { size: '140 Litres', bags: '4 full black bags', price: 70, quantity: 2 },
-    ],
-  };
+  const { data } = route.params || {};
 
   const calculateTotal = () => {
-    return bins.reduce((total, bin) => total + bin.price * bin.quantity, 0);
+    return data?.trash_bins?.reduce((total, bin) => total + getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins, 0);
   };
 
   const onProceedPressed = () => {
@@ -29,42 +27,56 @@ const ScheduleConfirmation = ({ route }) => {
     navigation.navigate("BottomTabNavigator",{screen: "Payment",});
   };
 
+  const getLocationName = (id) =>{
+    const found = pickupPoints?.find(item => item?.id == id)
+    return found?.name
+  }
+
+  getSubscriptionName = (id) => {
+    const found = subscriptions?.find(item => item?.subscription_id == id)
+    return found?.subscription_name
+  }
+
+  const getBinSize = (id) =>{
+    const found = bins.find(item => item?.id == id)
+    return found?.size
+  }
+
+  const getBinPrice = (id) =>{
+    const found = bins.find(item => item?.id == id)
+    return found?.price
+  }
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Confirm Schedule Details</Text>
 
       <View style={styles.detailsCard}>
         <Image source={require('../assets/schedule.png')} style={styles.binImage} />
+        
         <ScrollView style={styles.detailsText} showsVerticalScrollIndicator={false}>
           <View style={styles.detailRow}>
             <Text style={styles.label}>Location name:</Text>
-            <Text style={styles.value}>{locationName}</Text>
+            <Text style={styles.value}>{getLocationName(data?.location)}</Text>
           </View>
           <View style={styles.detailRow}>
-            <Text style={styles.label}>Coordinates:</Text>
-            <Text style={styles.value}>{coordinates}</Text>
+            <Text style={styles.label}>Subscription:</Text>
+            <Text style={styles.value}>{getSubscriptionName(data?.subscription)}</Text>
           </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.label}>Duration:</Text>
-            <Text style={styles.value}>{duration}</Text>
-          </View>
-          {bins.map((bin, index) => (
+          {data?.trash_bins.map((bin, index) => (
             <View key={index} style={styles.binDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Bin size:</Text>
-                <Text style={styles.value}>{bin.size}</Text>
-              </View>
-              <View style={styles.detailRow}>
-                <Text style={styles.label}>Bag:</Text>
-                <Text style={styles.value}>{bin.bags}</Text>
+                <Text style={styles.value}>{getBinSize(bin?.trash_bin)}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Quantity:</Text>
-                <Text style={styles.value}>{bin.quantity}</Text>
+                <Text style={styles.value}>{bin.number_of_trash_bins}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Price:</Text>
-                <Text style={styles.valueprice}>${bin.price * bin.quantity}</Text>
+                <Text style={styles.valueprice}>{`GHC ${getBinPrice(bin?.trash_bin) * bin.number_of_trash_bins}.00`}</Text>
               </View>
             </View>
           ))}
@@ -72,7 +84,7 @@ const ScheduleConfirmation = ({ route }) => {
       </View>
 
       <TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
-        <Text style={styles.scheduleButtonText}>Proceed to payment - ${calculateTotal()}</Text>
+        <Text style={styles.scheduleButtonText}>{`Proceed to payment - GHC ${calculateTotal()}.00`}</Text>
       </TouchableOpacity>
 
       <Modal
@@ -83,7 +95,8 @@ const ScheduleConfirmation = ({ route }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}> Payment of ${calculateTotal()}?</Text>
+            <Text style={styles.modalText}>{`Payment of GHC ${calculateTotal()}.00?`}</Text>
+            <Text>Please proceed to payment</Text>
             <View style={styles.modalButtons}>
               <Pressable style={[styles.button, styles.buttonCancel]} onPress={() => setModalVisible(false)}>
                 <Text style={styles.textStyle}>Cancel</Text>

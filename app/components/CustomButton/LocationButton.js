@@ -35,37 +35,45 @@ const LocationButton = ({ setUserLocation }) => {
   return (
     <View style={{ alignItems: "center", marginTop: 20 }}>
       {loading ? (
+      <View style={{alignItems: 'center'}} >
         <LottieView
           source={require("../../assets/LocationSearch.json")}
           autoPlay
           loop
-          style={{ width: 100, height: 100 }}
+          style={{ width: 140, height: 140 }}
         />
+        <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "bold", color: "#7c6ddd" }}>
+            Fetching location, please wait
+          </Text>
+          </View>
       ) : locationFound ? (
         <View style={{ alignItems: "center" }}>
           <LottieView
             source={require("../../assets/NewDone.json")}
             autoPlay
             loop
-            style={{ width: 100, height: 100 }}
+            style={{ width: 140, height: 140 }}
           />
           <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "bold", color: "#7c6ddd" }}>
-            Location Found, proceed to submit
+            Location found, proceed to submit
           </Text>
         </View>
       ) : (
         <TouchableOpacity 
             style={{
-              width: 200, 
+              width: 140,
+              height: 140,
               backgroundColor: "#55A57F", 
               padding: 12, 
-              borderRadius: 10, 
-              alignItems: "center",
+              borderRadius: '100%', 
+              display: "flex",
+              justifyContent: 'center',
+                alignItems: 'center'
             }} 
             onPress={getLocation}
           >
-            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-              Get Current Location
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", textAlign: 'center' }}>
+              Click To Get Current Location
             </Text>
         </TouchableOpacity>
       )}
