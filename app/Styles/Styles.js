@@ -424,7 +424,7 @@ export const ScheduleScreen = StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    color: 'red',
+    color: '#34D186',
     fontWeight: 'bold',
     marginTop: 10,
   },
