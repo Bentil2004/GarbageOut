@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -42,7 +43,6 @@ const AddScheduleScreen = ({ route }) => {
 
   const handleSelectBin = (id) => {
     setSelectedBins((prevSelectedBins) => {
-      console.log(prevSelectedBins);
       const binExists = prevSelectedBins.some((bin) => bin.trash_bin === id);
 
       if (!binExists) {
@@ -83,8 +83,6 @@ const AddScheduleScreen = ({ route }) => {
     });
   };
 
-
-  
   // Handle bin removal (deletion)
   const handleCloseBin = (id) => {
     setSelectedBins((prevSelectedBins) => {
@@ -103,14 +101,57 @@ const AddScheduleScreen = ({ route }) => {
     number_of_trash_bins: bin.number_of_trash_bins,
   }));
 
+
+
+
+
   // Submit Schedule to backend
-  const submitSchedule = () => {
+  const submitSchedule = async () => {
+    if (!selectedLocation) {
+      Alert.alert("Error", "Please select a location.");
+      return;
+    }
+
+    if (!selectedOption) {
+      Alert.alert("Error", "Please select a subscription.");
+      return;
+    }
+
     const data = {
-      location: selectedLocation.id,
       subscription: selectedOption.subscription_id,
+      location: selectedLocation,
       trash_bins: trashBins.length > 0 ? trashBins : null,
     };
+
+    console.log("backend data:", JSON.stringify(data, null, 2));
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${BASE_URL}schedules/schedule-pickup/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.access}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        Alert.alert("Success", "Schedule submitted successfully!");
+        navigation.navigate("ScheduleConfirmation");
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Error", errorData?.message || "Something went wrong.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+
+
 
   // Fetch pickup points
   const fetchPickup = async () => {
@@ -171,6 +212,8 @@ const AddScheduleScreen = ({ route }) => {
     }
   };
 
+
+  //Submit Location
   const handleSubmit = async () => {
     if (!address?.coords) {
       Alert.alert("Error", "Please get your location first.");
@@ -214,7 +257,6 @@ const AddScheduleScreen = ({ route }) => {
   };
 
   const handleOptionSelect = (option) => {
-    console.log(option);
     setSelectedOption(option);
     setInputValues(Array(option.per_month).fill(""));
   };
@@ -225,11 +267,15 @@ const AddScheduleScreen = ({ route }) => {
     fetchBins();
   }, []);
 
+
+
   useEffect(() => {
     if (route.params?.confirmedAddress) {
       setAddress(route.params.confirmedAddress);
     }
   }, [route.params?.confirmedAddress]);
+
+
 
   const getOrdinalSuffix = (day) => {
     if (day >= 11 && day <= 13) {
@@ -247,8 +293,6 @@ const AddScheduleScreen = ({ route }) => {
     }
   };
 
-
-  
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollview}>
@@ -277,6 +321,8 @@ const AddScheduleScreen = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
+
+
 
 
         <Modal
@@ -316,13 +362,6 @@ const AddScheduleScreen = ({ route }) => {
             </View>
           </View>
         </Modal>
-
-
-
-
-
-
-
 
 
 
@@ -386,7 +425,9 @@ const AddScheduleScreen = ({ route }) => {
                 key={bin.id}
                 style={[
                   styles.binContainer,
-                  selectedBins.some(binGroup => binGroup.trash_bin === bin.id) && styles.selectedBin,
+                  selectedBins.some(
+                    (binGroup) => binGroup.trash_bin === bin.id
+                  ) && styles.selectedBin,
                 ]}
                 onPress={() => handleSelectBin(bin.id)}
               >
@@ -399,7 +440,9 @@ const AddScheduleScreen = ({ route }) => {
                   <Text style={styles.price}>
                     GHC {bin.price * (quantities[bin.id] || 1)}
                   </Text>
-                  {selectedBins.some(binGroup => binGroup.trash_bin === bin.id) && (
+                  {selectedBins.some(
+                    (binGroup) => binGroup.trash_bin === bin.id
+                  ) && (
                     <View style={styles.quantityContainer}>
                       <TouchableOpacity
                         onPress={() => handleQuantityChange(bin.id, "decrease")}
@@ -428,8 +471,6 @@ const AddScheduleScreen = ({ route }) => {
           </View>
         )}
       </ScrollView>
-
-
 
       <TouchableOpacity style={styles.scheduleButton} onPress={submitSchedule}>
         <Text style={styles.scheduleButtonText}>Proceed to Submit</Text>
