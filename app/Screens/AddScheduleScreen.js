@@ -22,6 +22,7 @@ import { usePickupPoints } from "../context/PickupPointsContext";
 import { useSubscriptions } from "../context/SubscriptionsContext";
 import { useBins } from "../context/BinsContext";
 
+
 const AddScheduleScreen = ({ route }) => {
   //const [repeatOption, setRepeatOption] = useState("");
   const [address, setAddress] = useState({});
@@ -105,9 +106,6 @@ const AddScheduleScreen = ({ route }) => {
   }));
 
 
-
-
-
   // Submit Schedule to backend
   const submitSchedule = async () => {
     if (!selectedLocation) {
@@ -161,9 +159,6 @@ const AddScheduleScreen = ({ route }) => {
       setIsLoading1(false);
     }
   };
-
-
-
 
   // Fetch pickup points
   const fetchPickup = async () => {
@@ -276,15 +271,11 @@ const AddScheduleScreen = ({ route }) => {
     fetchBins();
   }, []);
 
-
-
   useEffect(() => {
     if (route.params?.confirmedAddress) {
       setAddress(route.params.confirmedAddress);
     }
   }, [route.params?.confirmedAddress]);
-
-
 
   const getOrdinalSuffix = (day) => {
     if (day >= 11 && day <= 13) {
@@ -302,10 +293,21 @@ const AddScheduleScreen = ({ route }) => {
     }
   };
 
+  const onNotificationPressed = () => {
+    navigation.navigate('Notification');
+  };
+
+
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Schedule new pickup</Text>
+        <Text style={styles.subtitle}>Add new pickup</Text>
+        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+            <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
+          </TouchableOpacity>
+      </View>
       <ScrollView style={styles.scrollview}>
-        <Text style={styles.header}>Schedule new pickup</Text>
 
         <View style={styles.addressContainer}>
           <Text style={styles.sectionTitletop}>Please select a location </Text>
@@ -330,9 +332,6 @@ const AddScheduleScreen = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-
-
-
 
         <Modal
           visible={isModalVisible}
@@ -375,8 +374,6 @@ const AddScheduleScreen = ({ route }) => {
 
 
 
-
-
         <Text style={styles.sectionTitledown}>Subscription for Pickup</Text>
         {loading && subscriptions?.length == 0 ? (
           <ActivityIndicator size="small" color="#7C6DDD" />
@@ -414,14 +411,6 @@ const AddScheduleScreen = ({ route }) => {
             </TouchableOpacity>
           ))
         )}
-
-
-
-
-
-
-
-
 
         <Text style={styles.sectionTitledown}>Size of Bin</Text>
         <Text style={styles.sectionSubtext}>Please select the bin size:</Text>

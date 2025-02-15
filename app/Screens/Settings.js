@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Modal, Pressable , ScrollView
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../context/UserContext';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 
 const Settings = () => {
   const navigation = useNavigation();
@@ -51,9 +53,21 @@ const Settings = () => {
     navigation.navigate('Support');
   };
 
+  const onNotificationPressed = () => {
+    navigation.navigate('Notification');
+  };
+
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Settings</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.subtitle}>View and update your app settings</Text>
+        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+            <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
+          </TouchableOpacity>
+
+      </View>
 
       <ScrollView style={styles.body}>
         <TouchableOpacity style={styles.row} onPress={onLanguagechange}>
@@ -131,15 +145,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   header: {
-    fontSize: 34,
+    backgroundColor: '#55A57F',
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    position: 'relative',
+  },
+ title: {
+    fontSize: 26,
     fontWeight: 'bold',
-    paddingTop: 60,
-    paddingHorizontal: 30,
-    paddingBottom: 10,
+    color: 'white',
+    marginBottom: 0,
+    marginTop: 15,
+  }, 
+  subtitle: {
+    fontSize: 16,
+    color: 'white',
+  },
+  notificationIconWrapper: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+  },
+  notificationIcon: {
+    color: 'white',
+    paddingTop: 10
   },
   body: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 40,
     marginTop: -30,
   },
   row: {

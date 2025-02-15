@@ -1,55 +1,121 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useUser } from '../context/UserContext';
+import { useSchedules } from '../context/SchedulesContext';
+import { BASE_URL } from '../utils/config';
 
-const Payment = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('Upcoming');
-  
-  const payments = [
-    { id: '1', date: '2024-10-01', amount: 'GHC120.00', status: 'Paid' },
-    { id: '2', date: '2024-11-01', amount: 'GHC240.00', status: 'Upcoming' },
-    { id: '3', date: '2024-10-01', amount: 'GHC520.00', status: 'Paid' },
-  ];
 
-  const filteredPayments = payments.filter(payment => payment.status === activeTab);
+const Payment = () => {
+  const navigation = useNavigation();
+  const { user } = useUser();
+  const { schedules, setSchedules } = useSchedules()
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const [activeTab, setActiveTab] = useState('NotPaid');
+  const [paid, setPaid] = useState(false)
+   const onNotificationPressed = () => {
+    navigation.navigate('Notification');
+  };
+
+  const fetchSchedules = async () => {
+    try {
+      console.log('fetching')
+      setIsLoading(true);
+      const response = await fetch(`${BASE_URL}/schedules/schedule-pickup/`, {
+        headers: {
+          Authorization: `Bearer ${user?.access}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error(errorData)
+      }
+
+      const data = await response.json();
+      const sortedData = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setSchedules(sortedData)
+      console.log('sorted: ',sortedData)
+    } catch (error) {
+      console.error("Fetch pickup error:", error);
+    } finally {
+      setIsLoading(false)
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules()
+      }, []);
+
+  const filteredPayments = schedules.filter(item => item?.payment?.payed === paid);
 
   const renderPaymentItem = ({ item }) => (
     <TouchableOpacity 
-      style={styles.paymentRow} 
-      onPress={() => {
-        if (item.status === 'Upcoming') {
-          navigation.navigate('ScheduleConfirmation');
+      key={item?.schedule_id} style={styles.scheduleCard} 
+ onPress={() => {
+        if (item?.payment?.payed != true) {
+          navigation.navigate('ScheduleConfirmation', {data: item});
         } else {
           navigation.navigate('PaidSubs');
         }
       }}
     >
-      <Text style={styles.paymentDate}>{item.date}</Text>
-      <Text style={styles.paymentAmount}>{item.amount}</Text>
-      <Text style={[styles.paymentStatus, item.status === 'Upcoming' ? styles.upcoming : styles.paid]}>
-        {item.status}
-      </Text>
+     
+                <Image source={require('../assets/schedule.png')} style={styles.binImage} />
+                <View style={styles.binDetails}>
+                <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
+                <Text style={styles.scheduleTime}>{item?.subscription?.subscription_name}</Text>
+                  {item?.subscription?.schedules && item?.subscription?.schedules .length > 0 && (
+                  <Text style={styles.scheduleTime}>
+                    {"Pickup date on "}
+                    {item?.subscription?.schedules?.map((schedule, idx) => (
+                      <Text key={schedule.id}>
+                        {schedule.day_of_the_month}
+                        {getOrdinalSuffix(schedule.day_of_the_month)}
+                        {idx < item?.subscription?.schedules.length - 1 ? ", " : ""}
+                      </Text>
+                    ))}
+                  </Text>
+                )} 
+
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Text style={styles.binPrice}>{`GHC ${item?.payment?.amount}`}</Text>
+                  <Text style={[styles.status, {color: `${item?.payment?.payed ? '#55A57F' :"red"}`} ]}>{item?.payment?.payed ? 'Paid' : 'Not paid'}</Text>
+                </View>
+               </View>
+
     </TouchableOpacity>
   );
+
+  const renderEmpty = () =>(
+    <Text style={{textAlign: 'center', fontWeight: 'bold', fontSize: 32, color: 'gray', marginTop: 40}}>Empty</Text>
+  )
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Payment</Text>
-        <Text style={styles.subtitle}>Payment transactions</Text>
+        <Text style={styles.title}>Payment transactions</Text>
+        <Text style={styles.subtitle}>View and complete all payment transactions</Text>
+        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+            <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
+          </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'Upcoming' && styles.activeTab]}
-          onPress={() => setActiveTab('Upcoming')}
+          style={[styles.tab, activeTab === 'NotPaid' && styles.activeTab]}
+          onPress={() => {setActiveTab('NotPaid'); setPaid(false)}}
         >
-          <Text style={styles.tabText}>Upcoming</Text>
+          <Text style={[styles.tabText, activeTab === 'NotPaid' && styles.activeTabText]}>Pending</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Paid' && styles.activeTab]}
-          onPress={() => setActiveTab('Paid')}
+          onPress={() => {setActiveTab('Paid'); setPaid(true)}}
         >
-          <Text style={styles.tabText}>Paid</Text>
+          <Text style={[styles.tabText, activeTab === 'Paid' && styles.activeTabText]}>Paid</Text>
         </TouchableOpacity>
       </View>
 
@@ -58,6 +124,7 @@ const Payment = ({ navigation }) => {
         renderItem={renderPaymentItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.paymentList}
+        ListEmptyComponent={renderEmpty}
       />
     </View>
   );
@@ -73,9 +140,9 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#55A57F',
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingTop: 40,
+    paddingBottom: 20,
     position: 'relative',
-    height: 140,
   },
   title: {
     fontSize: 26,
@@ -87,6 +154,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: 'white',
+  },
+  notificationIconWrapper: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+  },
+  notificationIcon: {
+    color: 'white',
+    paddingTop: 10
   },
   tabContainer: {
     flexDirection: 'row',
@@ -100,12 +176,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginHorizontal: 5,
     backgroundColor: '#EAEAEA',
+    color: '#7c6ddd'
   },
   activeTab: {
     backgroundColor: '#7C6DDD',
+    color: 'white' 
+  },
+  activeTabText: {
+    color:'white'
   },
   tabText: {
-    color: 'white',
+    color: '#7c6ddd',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -145,4 +226,48 @@ const styles = StyleSheet.create({
   paid: {
     color: '#34D186',
   },
+  scheduleCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  binImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginRight: 15,
+  },
+  binDetails: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  scheduleDate: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 2,
+  },
+  scheduleTime: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 4,
+  },
+  binInfo: {
+    fontSize: 12,
+    color: '#777',
+  },
+  binPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#34D186',
+  },
+
 });

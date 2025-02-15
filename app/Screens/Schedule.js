@@ -14,7 +14,8 @@ const Schedule = () => {
   const [binCount, setBinCount] = useState(1);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [repeatOption, setRepeatOption] = useState('');
-  const [selectedDays, setSelectedDays] = useState([]);  const navigation = useNavigation();
+  const [selectedDays, setSelectedDays] = useState([]);  
+  const navigation = useNavigation();
   const { user } = useUser();
   const { schedules, setSchedules } = useSchedules()
 
@@ -89,10 +90,7 @@ const Schedule = () => {
     }
   };
 
-  const calculateTotal = (bins) => {
-    //console.log(bins)
-    return bins.reduce((total, bin) => total + bin.price * bin.quantity, 0);
-  };
+  
 
   return (
     <View style={styles.container}>
@@ -128,7 +126,10 @@ const Schedule = () => {
                   </Text>
                 )} 
 
-                <Text style={styles.binPrice}>{`GHC ${calculateTotal(shedule?.trash_bins)}`}</Text>
+                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                <Text style={styles.binPrice}>{`GHC ${shedule?.payment?.amount}`}</Text>
+                  <Text style={[styles.status, {color: `${shedule?.picked_up ? '#55A57F' :"red"}`} ]}>{shedule?.picked_up ? 'Picked up' : 'Not picked up'}</Text>
+                </View>
                </View>
             </View>
           ))}

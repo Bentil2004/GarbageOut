@@ -64,7 +64,7 @@ const ScheduleConfirmation = ({ route }) => {
             <Text style={styles.label}>Subscription:</Text>
             <Text style={styles.value}>{getSubscriptionName(data?.subscription)}</Text>
           </View>
-          {data?.trash_bins.map((bin, index) => (
+          {data?.trash_bins?.map((bin, index) => (
             <View key={index} style={styles.binDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Bin size:</Text>
