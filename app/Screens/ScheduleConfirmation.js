@@ -13,6 +13,7 @@ const ScheduleConfirmation = ({ route }) => {
   const { bins } = useBins()
 
   const { data } = route.params || {};
+  console.log(subscriptions)
 
   const calculateTotal = () => {
     return data?.trash_bins?.reduce((total, bin) => total + getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins, 0);
@@ -32,7 +33,7 @@ const ScheduleConfirmation = ({ route }) => {
     return found?.name
   }
 
-  getSubscriptionName = (id) => {
+  const getSubscriptionName = (id) => {
     const found = subscriptions?.find(item => item?.subscription_id == id)
     return found?.subscription_name
   }
@@ -58,11 +59,11 @@ const ScheduleConfirmation = ({ route }) => {
         <ScrollView style={styles.detailsText} showsVerticalScrollIndicator={false}>
           <View style={styles.detailRow}>
             <Text style={styles.label}>Location name:</Text>
-            <Text style={styles.value}>{getLocationName(data?.location)}</Text>
+            <Text style={styles.value}>{data?.location?.name}</Text>
           </View>
           <View style={styles.detailRow}>
             <Text style={styles.label}>Subscription:</Text>
-            <Text style={styles.value}>{getSubscriptionName(data?.subscription)}</Text>
+            <Text style={styles.value}>{data?.subscription?.subscription_name}</Text>
           </View>
           {data?.trash_bins?.map((bin, index) => (
             <View key={index} style={styles.binDetails}>
@@ -72,20 +73,30 @@ const ScheduleConfirmation = ({ route }) => {
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Quantity:</Text>
-                <Text style={styles.value}>{bin.number_of_trash_bins}</Text>
+                <Text style={styles.value}>{bin?.number_of_trash_bins}</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Price:</Text>
-                <Text style={styles.valueprice}>{`GHC ${getBinPrice(bin?.trash_bin) * bin.number_of_trash_bins}.00`}</Text>
+                <Text style={styles.valueprice}>{`GHC ${getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins}.00`}</Text>
               </View>
             </View>
           ))}
+          <View style={styles.detailRow}>
+            <Text style={styles.label}>Total amount:</Text>
+            <Text style={styles.value}>{`GHC ${data?.payment?.amount}`}</Text>
+          </View>
+
         </ScrollView>
       </View>
 
-      <TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
+      {/*<TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
         <Text style={styles.scheduleButtonText}>{`Proceed to payment - GHC ${calculateTotal()}.00`}</Text>
+      </TouchableOpacity>*/}
+      <View style={styles.scheduleButtonContainer} >
+        <TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
+        <Text style={styles.scheduleButtonText}>Proceed to Payment</Text>
       </TouchableOpacity>
+      </View>
 
       <Modal
         animationType="slide"
@@ -162,20 +173,36 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
     paddingTop: 10,
   },
-  scheduleButton: {
+  scheduleButtonContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#7C6DDD',
-    paddingVertical: 35,
+    //backgroundColor: '#7C6DDD',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
     alignItems: 'center',
+  },
+  scheduleButton: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#7C6DDD',
+    paddingVertical: 15,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    // marginTop: 15,
+    marginBottom: 30,
   },
   scheduleButtonText: {
     color: 'white',
-    fontSize: 21,
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 10,
   },
-  valueprice: {
+
+    valueprice: {
     color: '#34D186',
     fontWeight: 'bold',
     fontSize: 16,

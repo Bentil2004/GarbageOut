@@ -20,6 +20,22 @@ const Payment = () => {
     navigation.navigate('Notification');
   };
 
+  const getOrdinalSuffix = (day) => {
+    if (day >= 11 && day <= 13) {
+      return "th";
+    }
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
   const fetchSchedules = async () => {
     try {
       console.log('fetching')
@@ -83,7 +99,7 @@ const Payment = () => {
 
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
                 <Text style={styles.binPrice}>{`GHC ${item?.payment?.amount}`}</Text>
-                  <Text style={[styles.status, {color: `${item?.payment?.payed ? '#55A57F' :"red"}`} ]}>{item?.payment?.payed ? 'Paid' : 'Not paid'}</Text>
+                  <Text style={[styles.status, {color: `${item?.payment?.payed ? '#55A57F' :"red"}`, backgroundColor: `${item?.payment?.payed ? '#55A57F30' :"#ff000030"}`, padding: 5, borderRadius: 10, paddingHorizontal: 10} ]}>{item?.payment?.payed ? 'Paid' : 'Not paid'}</Text>
                 </View>
                </View>
 
