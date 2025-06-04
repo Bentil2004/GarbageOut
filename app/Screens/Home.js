@@ -14,6 +14,7 @@ import { HomePage } from "../Styles/Styles";
 import { useSchedules } from "../context/SchedulesContext";
 import { useUser } from "../context/UserContext";
 import { BASE_URL } from "../utils/config";
+import { useBins } from "../context/BinsContext";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -24,6 +25,7 @@ const Home = () => {
    const upcoming = schedules?.filter(item => item?.picked_up == false && item?.payment?.payed == true)
     return upcoming
   }, [schedules])
+  const { setBins } = useBins()
 
 
   const fetchSchedules = async () => {
@@ -52,9 +54,24 @@ const Home = () => {
     }
   };
 
+  const fetchBins = async () => {
+    //setLoadingBins(true);
+    try {
+      const response = await fetch(`${BASE_URL}core/bins/`);
+      const data = await response.json();
+      setBins(data);
+    } catch (error) {
+      console.error("Error fetching bins:", error.message);
+    } finally {
+      //setLoadingBins(false);
+    }
+  };
+
+
   
   useEffect(() => {
     fetchSchedules()
+    fetchBins()
       }, []);
 
   const onNotificationPressed = () => {

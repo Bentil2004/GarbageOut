@@ -1,11 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Modal, Pressable } from 'react-native';
 import { usePickupPoints } from '../context/PickupPointsContext';
 import { useSubscriptions } from '../context/SubscriptionsContext';
 import { useBins } from '../context/BinsContext';
+import MobileMoneyPayment from '../components/MobileMoneyPayment';
 
 const ScheduleConfirmation = ({ route }) => {
+
+  const paystackWebViewRef = useRef(null); 
+
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const {pickupPoints} = usePickupPoints()
@@ -13,7 +17,7 @@ const ScheduleConfirmation = ({ route }) => {
   const { bins } = useBins()
 
   const { data } = route.params || {};
-  console.log(subscriptions)
+  console.log(data)
 
   const calculateTotal = () => {
     return data?.trash_bins?.reduce((total, bin) => total + getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins, 0);
@@ -40,6 +44,7 @@ const ScheduleConfirmation = ({ route }) => {
 
   const getBinSize = (id) =>{
     const found = bins.find(item => item?.id == id)
+    console.log("getsize", id, bins)
     return found?.size
   }
 
@@ -83,7 +88,7 @@ const ScheduleConfirmation = ({ route }) => {
           ))}
           <View style={styles.detailRow}>
             <Text style={styles.label}>Total amount:</Text>
-            <Text style={styles.value}>{`GHC ${data?.payment?.amount}`}</Text>
+            <Text style={styles.value}>{`GHC ${data?.price}`}</Text>
           </View>
 
         </ScrollView>
@@ -92,13 +97,20 @@ const ScheduleConfirmation = ({ route }) => {
       {/*<TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
         <Text style={styles.scheduleButtonText}>{`Proceed to payment - GHC ${calculateTotal()}.00`}</Text>
       </TouchableOpacity>*/}
-      <View style={styles.scheduleButtonContainer} >
+      {/*<View style={styles.scheduleButtonContainer} >
         <TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
         <Text style={styles.scheduleButtonText}>Proceed to Payment</Text>
       </TouchableOpacity>
-      </View>
+      </View>*/}
+      
+     <MobileMoneyPayment
+  scheduleId={data?.schedule_id}
+        styles={styles}
+  onSuccess={(data) => console.log("Payment success", data)}
+  onCancel={(err) => console.error("Payment failed", err)}
+/>
 
-      <Modal
+      {/*<Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -118,7 +130,7 @@ const ScheduleConfirmation = ({ route }) => {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </View>
   );
 };

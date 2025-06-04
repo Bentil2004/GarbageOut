@@ -1,14 +1,28 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Image, View } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate('Onbording'); 
-    }, 3000); 
+    const checkToken = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('access_token');
 
-    return () => clearTimeout(timer);
+        setTimeout(() => {
+          if (token) {
+            navigation.replace("BottomTabNavigator");
+          } else {
+            navigation.replace('Onboarding');
+          }
+        }, 2000);
+      } catch (error) {
+        console.error('Error checking token:', error);
+        navigation.replace('Onboarding');
+      }
+    };
+
+    checkToken();
   }, [navigation]);
 
   return (
@@ -36,3 +50,4 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+

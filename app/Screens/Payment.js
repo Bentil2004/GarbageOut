@@ -66,7 +66,7 @@ const Payment = () => {
     fetchSchedules()
       }, []);
 
-  const filteredPayments = schedules.filter(item => item?.payment?.payed === paid);
+  const filteredPayments = schedules.filter(item => item?.has_payed == paid);
 
   const renderPaymentItem = ({ item }) => (
     <TouchableOpacity 
@@ -84,7 +84,7 @@ const Payment = () => {
                 <View style={styles.binDetails}>
                 <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
                 <Text style={styles.scheduleTime}>{item?.subscription?.subscription_name}</Text>
-                  {item?.subscription?.schedules && item?.subscription?.schedules .length > 0 && (
+                  {item?.subscription?.schedules && item?.subscription?.schedules.length > 0 && (
                   <Text style={styles.scheduleTime}>
                     {"Pickup date on "}
                     {item?.subscription?.schedules?.map((schedule, idx) => (
@@ -98,7 +98,7 @@ const Payment = () => {
                 )} 
 
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Text style={styles.binPrice}>{`GHC ${item?.payment?.amount}`}</Text>
+                <Text style={styles.binPrice}>{`GHC ${item?.price}`}</Text>
                   <Text style={[styles.status, {color: `${item?.payment?.payed ? '#55A57F' :"red"}`, backgroundColor: `${item?.payment?.payed ? '#55A57F30' :"#ff000030"}`, padding: 5, borderRadius: 10, paddingHorizontal: 10} ]}>{item?.payment?.payed ? 'Paid' : 'Not paid'}</Text>
                 </View>
                </View>

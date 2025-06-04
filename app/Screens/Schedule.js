@@ -127,7 +127,7 @@ const Schedule = () => {
                 )} 
 
                   <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Text style={styles.binPrice}>{`GHC ${shedule?.payment?.amount}`}</Text>
+                <Text style={styles.binPrice}>{`GHC ${shedule?.price}`}</Text>
                   <Text style={[styles.status, {color: `${shedule?.picked_up ? '#55A57F' :"red"}`} ]}>{shedule?.picked_up ? 'Picked up' : 'Not picked up'}</Text>
                 </View>
                </View>

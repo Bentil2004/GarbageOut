@@ -1,24 +1,49 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import * as SecureStore from "expo-secure-store";
 
-// Create User Context
 const UserContext = createContext();
 
-// Custom hook for using the UserContext
 export const useUser = () => useContext(UserContext);
 
-// UserProvider Component
+const TOKEN_KEY = "access_token";
+
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Function to handle login
-  const login = (userData) => {
-    setUser(userData);
+  const login = async (userData) => {
+    try {
+      if (userData?.access) {
+        await SecureStore.setItemAsync(TOKEN_KEY, userData.access);
+      }
+      setUser(userData);
+    } catch (error) {
+      console.error("Error storing access token:", error);
+    }
   };
 
-  // Function to handle logout
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+    } catch (error) {
+      console.error("Error removing access token:", error);
+    }
     setUser(null);
   };
+
+  useEffect(() => {
+    const loadToken = async () => {
+      try {
+        const accessToken = await SecureStore.getItemAsync(TOKEN_KEY);
+        if (accessToken) {
+          setUser({ access: accessToken });
+        }
+      } catch (error) {
+        console.error("Failed to load access token:", error);
+      }
+    };
+
+    loadToken();
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, login, logout }}>
