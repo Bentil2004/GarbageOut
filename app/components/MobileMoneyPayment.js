@@ -96,19 +96,20 @@ const MobileMoneyPayment = ({
             {loading ? (
               <ActivityIndicator size="large" color="#000" />
             ) : (
-              <>
+              <View style={modalStyles.buttonRow}>
                 <TouchableOpacity
-                  style={modalStyles.submitButton}
-                  onPress={handleSubmit}
-                >
-                  <Text style={{ color: "#fff", fontWeight: "bold" }}>
-                    Submit Payment
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setIsVisible(false)}>
-                  <Text style={{ marginTop: 10, color: "red" }}>Cancel</Text>
-                </TouchableOpacity>
-              </>
+    style={[modalStyles.modalButton, { backgroundColor: "#ccc" }]}
+    onPress={() => setIsVisible(false)}
+  >
+    <Text style={[modalStyles.buttonText, { color: "#333" }]}>Cancel</Text>
+  </TouchableOpacity>
+  <TouchableOpacity
+    style={[modalStyles.modalButton, { backgroundColor: "#34D186" }]}
+    onPress={handleSubmit}
+  >
+    <Text style={modalStyles.buttonText}>Submit</Text>
+  </TouchableOpacity>
+</View>
             )}
           </View>
         </View>
@@ -120,7 +121,7 @@ const MobileMoneyPayment = ({
 const modalStyles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: "#000000aa",
+    backgroundColor: "#00000088",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -128,27 +129,40 @@ const modalStyles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     width: "90%",
-    borderRadius: 10,
+    borderRadius: 12,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15,
+    textAlign: "center",
   },
   input: {
     borderColor: "#ccc",
     borderWidth: 1,
-    marginVertical: 10,
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
   },
-  submitButton: {
-    backgroundColor: "green",
-    padding: 15,
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
     alignItems: "center",
-    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
+
 
 export default MobileMoneyPayment;
 

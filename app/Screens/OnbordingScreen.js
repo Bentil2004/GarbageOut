@@ -17,19 +17,20 @@ const screens = [
   {
     image: require("../assets/onbord4.png"),
     bottomText:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molest.123",
+      "Welcome to GarbageOut! Easily schedule your trash pickup right from your phone—no more missed collection days.",
   },
   {
     image: require("../assets/onbord5.png"),
     bottomText:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molest.456",
+      "Track and manage your waste pickups, get reminders, and keep your home and environment clean with ease.",
   },
   {
     image: require("../assets/onbord6.png"),
     bottomText:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu turpis molest.789",
+      "Securely pay for trash collection services in just a few taps. Fast, reliable, and hassle-free with GarbageOut.",
   },
 ];
+
 
 const OnbordingScreen = () => {
   const navigation = useNavigation();

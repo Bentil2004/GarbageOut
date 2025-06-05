@@ -5,7 +5,7 @@ const PrivacyPolicy = ({navigation}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.backButton} onPress={() => navigation.navigate('Settings')}>←</Text>
+        <Text style={styles.backButton} onPress={() => navigation.goBack()}>←</Text>
         <Text style={styles.headerText}>Privacy Policy</Text>
       </View>
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -189,7 +189,7 @@ const PrivacyPolicy = ({navigation}) => {
       <Text style={styles.paragraph}>
         If you have any questions about this Privacy Policy, You can contact us:
       </Text>
-      <Text style={styles.listItem}>• By email: aerokonnect14@gmail.com</Text>
+      <Text style={styles.listItem}>• By email: garbageout@gmail.com</Text>
       </ScrollView>
     </View>
   );
@@ -204,19 +204,20 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 150,
+    height: 123,
     backgroundColor: '#55A57F',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     zIndex: 1000,
-    padding: -50,
+    paddingBottom: 20,
    
   },
   backButton: {
     position: 'absolute',
     left: 20,
+    paddingBottom: 20,
     fontSize: 29,
     color: '#fff',
    

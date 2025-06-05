@@ -63,9 +63,9 @@ const Settings = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Settings</Text>
         <Text style={styles.subtitle}>View and update your app settings</Text>
-        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+        {/* <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
             <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
       </View>
 
@@ -124,7 +124,7 @@ const Settings = () => {
             <Text style={styles.modalText}>Are you sure you want to log out?</Text>
             <View style={styles.modalButtons}>
               <Pressable style={[styles.button, styles.buttonConfirm]} onPress={confirmLogout}>
-                <Text style={styles.textStyle}>Confirm</Text>
+                <Text style={styles.textStyleRed}>Confirm</Text>
               </Pressable>
               <Pressable style={[styles.button, styles.buttonCancel]} onPress={cancelLogout}>
                 <Text style={styles.textStyle}>Cancel</Text>
@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingBottom: 20,
     position: 'relative',
+    zIndex: 1000
   },
  title: {
     fontSize: 26,
@@ -237,6 +238,10 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     color: '#000',
+    fontWeight: 'bold',
+  },
+  textStyleRed: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });

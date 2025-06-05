@@ -97,9 +97,9 @@ const Schedule = () => {
         <View style={styles.header}>
           <Text style={styles.title}>Schedule a Pick up</Text>
           <Text style={styles.subtitle}>Schedule a pick up at a selected duration</Text>
-          <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+          {/* <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
             <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
           <Text style={styles.sectionTitle}>SCHEDULED PICKUPS</Text>

@@ -12,7 +12,7 @@ const Support = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack(Settings)}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backButton}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerText}>Surpport Agent</Text>
@@ -40,14 +40,14 @@ const styles = StyleSheet.create({
       top: 0,
       left: 0,
       right: 0,
-      height: 150,
+      height: 123,
       backgroundColor:  '#55A57F',
-      justifyContent: 'center',
+      justifyContent: 'flex-end',
       alignItems: 'center',
       borderBottomWidth: 1,
       borderBottomColor: '#ddd',
       zIndex: 1000,
-      padding: -50,
+      paddingBottom: 20,
      
     },
     backButton: {

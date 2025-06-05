@@ -302,9 +302,9 @@ const AddScheduleScreen = ({ route }) => {
       <View style={styles.header}>
         <Text style={styles.title}>Schedule new pickup</Text>
         <Text style={styles.subtitle}>Add new pickup</Text>
-        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+        {/* <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
             <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       </View>
       <ScrollView style={styles.scrollview}>
 

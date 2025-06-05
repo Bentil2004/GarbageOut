@@ -104,13 +104,13 @@ const Home = () => {
       <View style={styles.greetingSection}>
         <Text style={styles.greetingText}>Welcome to GarbageOut</Text>
         <Text style={styles.subText}>Have you taken out the trash today!</Text>
-        <TouchableOpacity onPress={onNotificationPressed}>
+        {/* <TouchableOpacity onPress={onNotificationPressed}>
           <Icon
             name="notifications-outline"
             size={24}
             style={styles.notificationIcon}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.statsContainer}>

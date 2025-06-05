@@ -25,6 +25,7 @@ import LogIn from "./app/Screens/Authentication/LogIn";
 import SignUp from "./app/Screens/Authentication/SignUp";
 import ForgotPassword from "./app/Screens/Authentication/ForgotPassword";
 import Payment from "./app/Screens/Payment";
+import SetNewPassword from "./app/Screens/Authentication/SetNewPassword.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,10 +36,11 @@ const Navigation = () => {
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
             <Stack.Screen name="LogIn" component={LogIn} />  
+            <Stack.Screen name="SetNewPassword" component={SetNewPassword} /> 
             <Stack.Screen name="Verification" component={Verification} />
             {/* <Stack.Screen name="OnbordSignUp" component={OnbordSignUp} /> */}
             {/* <Stack.Screen name="BinSize" component={BinSize} /> */}
-            <Stack.Screen name="Onbording" component={Onbording} />
+            <Stack.Screen name="Onboarding" component={Onbording} />
             <Stack.Screen name="PhoneVerification" component={PhoneVerification} />
             <Stack.Screen name="BottomTabNavigator" component={BottomTabNavigator} />
             <Stack.Screen name="ScheduleConfirmation" component={ScheduleConfirmation} />

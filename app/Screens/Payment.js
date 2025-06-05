@@ -115,9 +115,9 @@ const Payment = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Payment transactions</Text>
         <Text style={styles.subtitle}>View and complete all payment transactions</Text>
-        <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
+        {/* <TouchableOpacity onPress={onNotificationPressed} style={styles.notificationIconWrapper}>
             <Icon name="notifications-outline" size={24} style={styles.notificationIcon} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
       </View>
 
       <View style={styles.tabContainer}>

@@ -1,82 +1,103 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { BASE_URL } from '../../utils/config';
 
-const ForgotPasswordEmail = () => {
+const ForgotPasswordPhone = () => {
   const navigation = useNavigation();
   return <ForgotPassword navigation={navigation} />;
 };
 
 const ForgotPassword = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const validatePhone = (phone) => {
+  const phoneRegex = /^\+233\d{9}$/; // Ghana phone number: +233 followed by 9 digits
+  return phoneRegex.test(phone);
+};
 
   const onContinuePressed = async () => {
-    if (!validateEmail(email)) {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
+    if (!validatePhone(phone)) {
+      Alert.alert('Invalid Phone', 'Please enter a valid phone number.');
       return;
     }
 
-    try {
-      // Mocking password reset logic
-      const isMockSuccess = true; // Simulate success or failure
+    setLoading(true);
 
-      if (isMockSuccess) {
+    try {
+      const response = await fetch(BASE_URL+'accounts/request-password-reset/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: String(phone) }),
+      });
+
+      if (response.ok) {
         Alert.alert(
-          "Email Sent",
-          `A password reset link has been sent to ${email}. Please check your inbox.`,
-          [
-            {
-              text: "OK",
-              onPress: () => navigation.navigate("Login"),
-            },
-          ]
+          'SMS Sent',
+          `A password reset code has been sent to ${phone}.`,
+          [{ text: 'OK', onPress: () => navigation.navigate('SetNewPassword', { phone }) }]
         );
       } else {
-        throw new Error("mock_error");
+        const data = await response.json();
+        throw new Error(data || 'Request failed');
       }
     } catch (error) {
-      let errorMessage = "Something went wrong.";
-      if (error.message === "mock_error") {
-        errorMessage = "The email address is not valid or the user does not exist.";
-      }
-      Alert.alert("Error", errorMessage);
+      console.error(error)
+      Alert.alert('Error', error.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isEmailEmpty = email.length === 0;
+  const isPhoneEmpty = phone.length === 0;
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
+
       <View style={styles.container}>
         <Text style={styles.title}>Forgot Password</Text>
-        <Text style={styles.subtitle}>Please enter your email to reset the password</Text>
+        <Text style={styles.subtitle}>Enter your phone number to reset your password</Text>
+
         <View style={styles.inputContainer}>
-          <Icon name="email" size={20} color="#707070" style={styles.icon} />
+          <Icon name="phone" size={20} color="#707070" style={styles.icon} />
           <TextInput
-            placeholder="Email"
+            placeholder="+233xxx"
             placeholderTextColor="#707070"
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
             autoCapitalize="none"
           />
         </View>
+
         <TouchableOpacity
-          style={[styles.button, isEmailEmpty ? styles.buttonInitial : styles.buttonFilled]}
+          style={[
+            styles.button,
+            isPhoneEmpty || loading ? styles.buttonInitial : styles.buttonFilled,
+          ]}
           onPress={onContinuePressed}
-          disabled={isEmailEmpty}
+          disabled={isPhoneEmpty || loading}
         >
-          <Text style={styles.buttonText}>Continue</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Continue</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -86,7 +107,7 @@ const ForgotPassword = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: '#ffffff',
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
@@ -98,7 +119,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: '#34D186',
     fontSize: 20,
-    marginTop: 30
+    marginTop: 30,
   },
   container: {
     marginTop: 80,
@@ -153,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForgotPasswordEmail;
+export default ForgotPasswordPhone;
