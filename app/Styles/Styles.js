@@ -297,6 +297,11 @@ statusBadge: {
   paddingVertical: 4,
   paddingHorizontal: 12,
 },
+updatedText: {
+  fontSize: 12,
+  color: '#888',
+  marginTop: 4,
+},
 
 statusText: {
   fontWeight: '600',

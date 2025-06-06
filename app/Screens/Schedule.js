@@ -99,7 +99,14 @@ const Schedule = () => {
     }
   };
 
-  
+  const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
 
   return (
     <View style={styles.container}>
@@ -126,7 +133,12 @@ const Schedule = () => {
   <Image source={require('../assets/schedule.png')} style={styles.binImage} />
 
   <View style={styles.binDetails}>
-    <Text style={styles.scheduleDate}>{shedule?.location?.name}</Text>
+    <View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
+      <Text style={styles.scheduleDate}>{shedule?.location?.name}</Text>
+      <Text style={styles.updatedText}>
+        {formatDate(shedule?.created_at)}
+        </Text>
+      </View>
     <Text style={styles.scheduleTime}>{shedule?.subscription?.subscription_name}</Text>
 
     {shedule?.subscription?.schedules?.length > 0 && (

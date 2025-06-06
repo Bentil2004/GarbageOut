@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Image, ScrollView, Modal, Pressable } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
 import { usePickupPoints } from '../context/PickupPointsContext';
 import { useSubscriptions } from '../context/SubscriptionsContext';
 import { useBins } from '../context/BinsContext';
@@ -8,7 +8,6 @@ import MobileMoneyPayment from '../components/MobileMoneyPayment';
 
 const ScheduleConfirmation = ({ route }) => {
 
-  const paystackWebViewRef = useRef(null); 
 
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,6 +52,17 @@ const ScheduleConfirmation = ({ route }) => {
     return found?.price
   }
 
+  const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+};
+
 
   return (
     <View style={styles.container}>
@@ -70,6 +80,10 @@ const ScheduleConfirmation = ({ route }) => {
             <Text style={styles.label}>Subscription:</Text>
             <Text style={styles.value}>{data?.subscription?.subscription_name}</Text>
           </View>
+          <View style={styles.detailRow}>
+                      <Text style={styles.label}>Schedule Time:</Text>
+                      <Text style={styles.value}>{formatDate(data?.created_at)}</Text>
+                    </View>
           {data?.trash_bins?.map((bin, index) => (
             <View key={index} style={styles.binDetails}>
               <View style={styles.detailRow}>
