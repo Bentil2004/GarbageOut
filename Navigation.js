@@ -31,7 +31,7 @@ const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
   return (
-        <NavigationContainer>
+        
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
@@ -58,7 +58,6 @@ const Navigation = () => {
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="Payment" component={Payment} />
           </Stack.Navigator>
-        </NavigationContainer>
   );
 };
 

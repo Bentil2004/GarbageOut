@@ -18,6 +18,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(0)
 
   const inputRefs = useRef([]);
 
@@ -32,7 +33,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [count]);
 
   const handleVerificationCodeChange = (index, value) => {
     const newVerificationCode = [...verificationCode];
@@ -90,6 +91,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
   const handleResend = () => {
     console.warn("Resend verification code");
     setTimer(60);
+    setCount(prev=> prev + 1)
   };
 
   const onEditPressed = () => {

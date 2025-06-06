@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
+import { useNavigation } from "@react-navigation/native";
 
 const UserContext = createContext();
 
@@ -9,6 +10,7 @@ const TOKEN_KEY = "access_token";
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const navigation = useNavigation()
 
   const login = async (userData) => {
     try {
@@ -28,6 +30,7 @@ export const UserProvider = ({ children }) => {
       console.error("Error removing access token:", error);
     }
     setUser(null);
+    navigation.navigate('LogIn')
   };
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
@@ -15,10 +16,11 @@ import { useSchedules } from "../context/SchedulesContext";
 import { useUser } from "../context/UserContext";
 import { BASE_URL } from "../utils/config";
 import { useBins } from "../context/BinsContext";
+import * as SecureStore from "expo-secure-store";
 
 const Home = () => {
   const navigation = useNavigation();
-  const { user } = useUser();
+  const { logout } = useUser();
   const { schedules, setSchedules } = useSchedules()
   const [isLoading, setIsLoading] = useState(false);
   const shedules = useMemo(() => {
@@ -32,15 +34,19 @@ const Home = () => {
     try {
       console.log('fetching')
       setIsLoading(true);
+      const token = await SecureStore.getItemAsync("access_token");
       const response = await fetch(`${BASE_URL}/schedules/schedule-pickup/`, {
         headers: {
-          Authorization: `Bearer ${user?.access}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error(errorData)
+        if(errorData["code"] == "token_not_valid"){
+          logout()
+        }
       }
 
       const data = await response.json();
@@ -74,8 +80,9 @@ const Home = () => {
     fetchBins()
       }, []);
 
-  const onNotificationPressed = () => {
-    navigation.navigate("Notification");
+  const refetch = () => {
+    fetchSchedules()
+    fetchBins()
   };
 
   const onSchedulePressed = () => {
@@ -102,15 +109,22 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <View style={styles.greetingSection}>
+        <View>
         <Text style={styles.greetingText}>Welcome to GarbageOut</Text>
         <Text style={styles.subText}>Have you taken out the trash today!</Text>
-        {/* <TouchableOpacity onPress={onNotificationPressed}>
+        </View>
+        <TouchableOpacity disabled={isLoading} onPress={refetch} style={{width: 28,height: 28,marginRight:12, marginTop:20}}>
+          {
+          !isLoading?
           <Icon
-            name="notifications-outline"
+            name="refresh-outline"
             size={24}
-            style={styles.notificationIcon}
-          />
-        </TouchableOpacity> */}
+            style={{color:"white", fontWeight:"bold"}}
+          />:
+          <ActivityIndicator color={"white"} size={"small"} />
+}
+        </TouchableOpacity>
+        
       </View>
 
       <View style={styles.statsContainer}>

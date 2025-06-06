@@ -1,15 +1,15 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image, ScrollView, RefreshControl } from 'react-native';
 import { useUser } from '../context/UserContext';
 import { useSchedules } from '../context/SchedulesContext';
 import { BASE_URL } from '../utils/config';
+import * as SecureStore from "expo-secure-store";
 
 
 const Payment = () => {
   const navigation = useNavigation();
-  const { user } = useUser();
+  const { logout } = useUser();
   const { schedules, setSchedules } = useSchedules()
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,15 +40,19 @@ const Payment = () => {
     try {
       console.log('fetching')
       setIsLoading(true);
+      const token = await SecureStore.getItemAsync("access_token");
       const response = await fetch(`${BASE_URL}/schedules/schedule-pickup/`, {
         headers: {
-          Authorization: `Bearer ${user?.access}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error(errorData)
+        if(errorData["code"] == "token_not_valid"){
+          logout()
+        }
       }
 
       const data = await response.json();
@@ -66,45 +70,68 @@ const Payment = () => {
     fetchSchedules()
       }, []);
 
+      const handleRefresh = () => {
+    fetchSchedules()
+  }
+
   const filteredPayments = schedules.filter(item => item?.has_payed == paid);
 
   const renderPaymentItem = ({ item }) => (
-    <TouchableOpacity 
-      key={item?.schedule_id} style={styles.scheduleCard} 
- onPress={() => {
-        if (item?.payment?.payed != true) {
-          navigation.navigate('ScheduleConfirmation', {data: item});
-        } else {
-          navigation.navigate('PaidSubs');
-        }
-      }}
-    >
-     
-                <Image source={require('../assets/schedule.png')} style={styles.binImage} />
-                <View style={styles.binDetails}>
-                <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
-                <Text style={styles.scheduleTime}>{item?.subscription?.subscription_name}</Text>
-                  {item?.subscription?.schedules && item?.subscription?.schedules.length > 0 && (
-                  <Text style={styles.scheduleTime}>
-                    {"Pickup date on "}
-                    {item?.subscription?.schedules?.map((schedule, idx) => (
-                      <Text key={schedule.id}>
-                        {schedule.day_of_the_month}
-                        {getOrdinalSuffix(schedule.day_of_the_month)}
-                        {idx < item?.subscription?.schedules.length - 1 ? ", " : ""}
-                      </Text>
-                    ))}
-                  </Text>
-                )} 
+  <TouchableOpacity 
+    key={item?.schedule_id} 
+    style={styles.scheduleCard}
+    onPress={() => {
+      if (item?.payment?.payed !== true) {
+        navigation.navigate('ScheduleConfirmation', { data: item });
+      } else {
+        navigation.navigate('PaidSubs');
+      }
+    }}
+  >
+    <Image source={require('../assets/schedule.png')} style={styles.binImage} />
+    
+    <View style={styles.binDetails}>
+      <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
+      <Text style={styles.scheduleTime}>{item?.subscription?.subscription_name}</Text>
 
-                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Text style={styles.binPrice}>{`GHC ${item?.price}`}</Text>
-                  <Text style={[styles.status, {color: `${item?.payment?.payed ? '#55A57F' :"red"}`, backgroundColor: `${item?.payment?.payed ? '#55A57F30' :"#ff000030"}`, padding: 5, borderRadius: 10, paddingHorizontal: 10} ]}>{item?.payment?.payed ? 'Paid' : 'Not paid'}</Text>
-                </View>
-               </View>
+      {item?.subscription?.schedules?.length > 0 && (
+        <Text style={styles.scheduleTime}>
+          Pickup date on{" "}
+          {item.subscription.schedules.map((schedule, idx) => (
+            <Text key={schedule.id}>
+              {schedule.day_of_the_month}
+              {getOrdinalSuffix(schedule.day_of_the_month)}
+              {idx < item.subscription.schedules.length - 1 ? ", " : ""}
+            </Text>
+          ))}
+        </Text>
+      )}
 
-    </TouchableOpacity>
-  );
+      <View style={styles.priceStatusContainer}>
+        <Text style={styles.binPrice}>{`GHC ${item?.price}`}</Text>
+        <View
+          style={[
+            styles.statusBadge,
+            {
+              backgroundColor: item?.payment?.payed ? '#DFF3EB' : '#FFE3E3',
+            },
+          ]}
+        >
+          <Text
+            style={{
+              color: item?.payment?.payed ? '#2E7D4F' : '#D32F2F',
+              fontWeight: '600',
+              fontSize: 12,
+            }}
+          >
+            {item?.payment?.payed ? 'Paid' : 'Not Paid'}
+          </Text>
+        </View>
+      </View>
+    </View>
+  </TouchableOpacity>
+);
+
 
   const renderEmpty = () =>(
     <Text style={{textAlign: 'center', fontWeight: 'bold', fontSize: 32, color: 'gray', marginTop: 40}}>Empty</Text>
@@ -135,6 +162,12 @@ const Payment = () => {
         </TouchableOpacity>
       </View>
 
+      <ScrollView refreshControl={
+                <RefreshControl
+                  refreshing={isLoading}
+                  onRefresh={handleRefresh}
+                  tintColor={"black"}
+                />} style={{flexGrow:1}}>
       <FlatList
         data={filteredPayments}
         renderItem={renderPaymentItem}
@@ -142,6 +175,7 @@ const Payment = () => {
         contentContainerStyle={styles.paymentList}
         ListEmptyComponent={renderEmpty}
       />
+      </ScrollView>
     </View>
   );
 };
@@ -243,47 +277,61 @@ const styles = StyleSheet.create({
     color: '#34D186',
   },
   scheduleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  binImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 15,
-  },
-  binDetails: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  scheduleDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  scheduleTime: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 4,
-  },
-  binInfo: {
-    fontSize: 12,
-    color: '#777',
-  },
-  binPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#34D186',
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  padding: 15,
+  borderRadius: 12,
+  marginBottom: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 3,
+  elevation: 2,
+},
+
+binImage: {
+  width: 60,
+  height: 60,
+  borderRadius: 10,
+  marginRight: 16,
+},
+
+binDetails: {
+  flex: 1,
+  justifyContent: 'center',
+},
+
+scheduleDate: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#222',
+  marginBottom: 4,
+},
+
+scheduleTime: {
+  fontSize: 14,
+  color: '#666',
+  marginBottom: 3,
+},
+
+binPrice: {
+  fontSize: 15,
+  fontWeight: '700',
+  color: '#2E7D4F',
+},
+
+priceStatusContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+},
+
+statusBadge: {
+  borderRadius: 20,
+  paddingVertical: 4,
+  paddingHorizontal: 12,
+},
 
 });

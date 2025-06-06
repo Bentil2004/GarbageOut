@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { BASE_URL } from "../utils/config";
 import { useUser } from "../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
 
 const MobileMoneyPayment = ({
   scheduleId,
@@ -22,6 +23,7 @@ const MobileMoneyPayment = ({
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
+    const navigation = useNavigation();
 
   const handleSubmit = async () => {
     if (!phone) {
@@ -68,6 +70,11 @@ const MobileMoneyPayment = ({
 
   return (
     <View style={styles?.scheduleButtonContainer}>
+
+      <TouchableOpacity style={styles.scheduleButtonL} onPress={() => navigation.navigate("BottomTabNavigator",{screen: "Payment",})}>
+              <Text style={styles?.scheduleButtonText}>Pay later</Text>
+            </TouchableOpacity>
+
       <TouchableOpacity
         style={styles?.scheduleButton}
         onPress={() => setIsVisible(true)}
@@ -98,10 +105,10 @@ const MobileMoneyPayment = ({
             ) : (
               <View style={modalStyles.buttonRow}>
                 <TouchableOpacity
-    style={[modalStyles.modalButton, { backgroundColor: "#ccc" }]}
+    style={[modalStyles.modalButton, { backgroundColor: "#aaa" }]}
     onPress={() => setIsVisible(false)}
   >
-    <Text style={[modalStyles.buttonText, { color: "#333" }]}>Cancel</Text>
+    <Text style={[modalStyles.buttonText, { color: "#fff" }]}>Cancel</Text>
   </TouchableOpacity>
   <TouchableOpacity
     style={[modalStyles.modalButton, { backgroundColor: "#34D186" }]}

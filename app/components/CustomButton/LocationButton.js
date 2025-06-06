@@ -6,31 +6,46 @@ import LottieView from "lottie-react-native";
 const LocationButton = ({ setUserLocation }) => {
   const [locationFound, setLocationFound] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentAccuracy, setCurrentAccuracy] = useState(null);
+
 
   const getLocation = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    try {
-
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission Denied", "Location access is required.");
-        setLoading(false);
-        return;
-      }
-
-      let userLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest,
-      });
-
-      setUserLocation(userLocation);
-      setLocationFound(true);
-    } catch (error) {
-      Alert.alert("Error", "Failed to fetch location.");
-    } finally {
+  try {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Location access is required.');
       setLoading(false);
+      return;
     }
-  };
+
+    const subscription = await Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.Highest,
+        timeInterval: 1000,
+        distanceInterval: 0,
+      },
+      (loc) => {
+        console.log("Received location:", loc);
+        setCurrentAccuracy(loc.coords.accuracy);
+
+        if (loc?.coords?.accuracy && loc.coords.accuracy <= 5) {
+          setUserLocation(loc);
+          setLocationFound(true);
+          setLoading(false);
+
+          subscription.remove();
+        }
+      }
+    );
+  } catch (error) {
+    Alert.alert('Error', 'Failed to fetch location.');
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <View style={{ alignItems: "center", marginTop: 20 }}>
@@ -45,6 +60,11 @@ const LocationButton = ({ setUserLocation }) => {
         <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "bold", color: "#7c6ddd" }}>
             Fetching location, please wait
           </Text>
+          {currentAccuracy && (
+  <Text style={{ fontSize: 12, color: '#555', marginTop: 5 }}>
+    Current accuracy: {currentAccuracy.toFixed(1)} meters
+  </Text>
+)}
           </View>
       ) : locationFound ? (
         <View style={{ alignItems: "center" }}>
@@ -57,6 +77,11 @@ const LocationButton = ({ setUserLocation }) => {
           <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "bold", color: "#7c6ddd" }}>
             Location found, proceed to submit
           </Text>
+          {currentAccuracy && (
+  <Text style={{ fontSize: 12, color: '#555', marginTop: 5 }}>
+    Current accuracy: {currentAccuracy.toFixed(1)} meters
+  </Text>
+)}
         </View>
       ) : (
         <TouchableOpacity 

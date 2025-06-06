@@ -82,7 +82,7 @@ const ScheduleConfirmation = ({ route }) => {
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Price:</Text>
-                <Text style={styles.valueprice}>{`GHC ${getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins}.00`}</Text>
+                <Text style={styles.valueprice}>{`GHC ${Number(getBinPrice(bin?.trash_bin) * bin?.number_of_trash_bins).toFixed(2)}`}</Text>
               </View>
             </View>
           ))}
@@ -90,13 +90,10 @@ const ScheduleConfirmation = ({ route }) => {
             <Text style={styles.label}>Total amount:</Text>
             <Text style={styles.value}>{`GHC ${data?.price}`}</Text>
           </View>
-
         </ScrollView>
+        
       </View>
 
-      {/*<TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
-        <Text style={styles.scheduleButtonText}>{`Proceed to payment - GHC ${calculateTotal()}.00`}</Text>
-      </TouchableOpacity>*/}
       {/*<View style={styles.scheduleButtonContainer} >
         <TouchableOpacity style={styles.scheduleButton} onPress={onProceedPressed}>
         <Text style={styles.scheduleButtonText}>Proceed to Payment</Text>
@@ -109,6 +106,8 @@ const ScheduleConfirmation = ({ route }) => {
   onSuccess={(data) => console.log("Payment success", data)}
   onCancel={(err) => console.error("Payment failed", err)}
 />
+
+
 
       {/*<Modal
         animationType="slide"
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
   },
   detailsText: {
     width: '100%',
-    marginBottom: 350,
+    marginBottom: 0,
   },
   detailRow: {
     flexDirection: 'row',
@@ -194,24 +193,36 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'center',
+    display:"flex",
+    flexDirection:"row",
+    gap:15
   },
   scheduleButton: {
-    width: '100%',
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#7C6DDD',
     paddingVertical: 15,
-    marginHorizontal: 20,
     borderRadius: 10,
     // marginTop: 15,
-    marginBottom: 30,
+    marginBottom: 20,
+  },
+  scheduleButtonL: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#aaa',
+    paddingVertical: 15,
+    borderRadius: 10,
+    // marginTop: 15,
+    marginBottom: 20,
   },
   scheduleButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    marginLeft: 10,
   },
 
     valueprice: {

@@ -7,10 +7,12 @@ import { SchedulesProvider } from "./app/context/SchedulesContext";
 import { PickupPointsProvider } from "./app/context/PickupPointsContext";
 import { SubscriptionsProvider } from "./app/context/SubscriptionsContext";
 import { BinsProvider } from "./app/context/BinsContext";
+import { NavigationContainer } from "@react-navigation/native";
 
 
 const App = () => {
   return (
+    <NavigationContainer>
     <UserProvider>
       <SchedulesProvider>
         <PickupPointsProvider>
@@ -24,6 +26,7 @@ const App = () => {
         </PickupPointsProvider>
       </SchedulesProvider>
     </UserProvider>
+    </NavigationContainer>
   );
 };
 const styles = StyleSheet.create({

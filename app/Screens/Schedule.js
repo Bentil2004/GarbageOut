@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image, Modal, ActivityIndicator, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { SchedulePage } from '../Styles/Styles';
@@ -7,6 +7,7 @@ import LottieView from "lottie-react-native";
 import { BASE_URL } from '../utils/config';
 import { useUser } from '../context/UserContext';
 import { useSchedules } from '../context/SchedulesContext';
+import * as SecureStore from "expo-secure-store";
 
 const Schedule = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,7 @@ const Schedule = () => {
   const [repeatOption, setRepeatOption] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);  
   const navigation = useNavigation();
-  const { user } = useUser();
+  const { logout } = useUser();
   const { schedules, setSchedules } = useSchedules()
 
 
@@ -32,15 +33,19 @@ const Schedule = () => {
     try {
       console.log('fetching')
       setIsLoading(true);
+            const token = await SecureStore.getItemAsync("access_token");
       const response = await fetch(`${BASE_URL}/schedules/schedule-pickup/`, {
         headers: {
-          Authorization: `Bearer ${user?.access}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         console.error(errorData)
+        if(errorData["code"] == "token_not_valid"){
+          logout()
+        }
       }
 
       const data = await response.json();
@@ -57,6 +62,10 @@ const Schedule = () => {
   useEffect(()=> {
     fetchSchedules()
   }, [])
+
+  const handleRefresh = () => {
+    fetchSchedules()
+  }
   
 
   const onRepeatOptionPressed = (option) => {
@@ -105,33 +114,60 @@ const Schedule = () => {
           <Text style={styles.sectionTitle}>SCHEDULED PICKUPS</Text>
 
           {schedules?.length > 0 ? (
-             <ScrollView style={styles.scrollContainer}>
+             <ScrollView refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={handleRefresh}
+            tintColor={"black"}
+          />} style={styles.scrollContainer}>
              <View style={styles.scheduleList}>
               {schedules.map((shedule) => (
               <View key={shedule?.schedule_id} style={styles.scheduleCard}>
-                <Image source={require('../assets/schedule.png')} style={styles.binImage} />
-                <View style={styles.binDetails}>
-                <Text style={styles.scheduleDate}>{shedule?.location?.name}</Text>
-                <Text style={styles.scheduleTime}>{shedule?.subscription?.subscription_name}</Text>
-                  {shedule?.subscription?.schedules && shedule?.subscription?.schedules .length > 0 && (
-                  <Text style={styles.scheduleTime}>
-                    {"Pickup date on "}
-                    {shedule?.subscription?.schedules?.map((schedule, idx) => (
-                      <Text key={schedule.id}>
-                        {schedule.day_of_the_month}
-                        {getOrdinalSuffix(schedule.day_of_the_month)}
-                        {idx < shedule?.subscription?.schedules.length - 1 ? ", " : ""}
-                      </Text>
-                    ))}
-                  </Text>
-                )} 
+  <Image source={require('../assets/schedule.png')} style={styles.binImage} />
 
-                  <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                <Text style={styles.binPrice}>{`GHC ${shedule?.price}`}</Text>
-                  <Text style={[styles.status, {color: `${shedule?.picked_up ? '#55A57F' :"red"}`} ]}>{shedule?.picked_up ? 'Picked up' : 'Not picked up'}</Text>
-                </View>
-               </View>
-            </View>
+  <View style={styles.binDetails}>
+    <Text style={styles.scheduleDate}>{shedule?.location?.name}</Text>
+    <Text style={styles.scheduleTime}>{shedule?.subscription?.subscription_name}</Text>
+
+    {shedule?.subscription?.schedules?.length > 0 && (
+      <Text style={styles.scheduleTime}>
+        Pickup date on{' '}
+        {shedule.subscription.schedules.map((schedule, idx) => (
+          <Text key={schedule.id}>
+            {schedule.day_of_the_month}
+            {getOrdinalSuffix(schedule.day_of_the_month)}
+            {idx < shedule.subscription.schedules.length - 1 ? ', ' : ''}
+          </Text>
+        ))}
+      </Text>
+    )}
+
+    <View style={styles.priceStatusContainer}>
+      <Text style={styles.binPrice}>{`GHC ${shedule?.price}`}</Text>
+
+      <View
+        style={[
+          styles.statusBadge,
+          {
+            backgroundColor: shedule?.picked_up ? '#DFF3EB' : '#FFE3E3',
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            {
+              color: shedule?.picked_up ? '#2E7D4F' : '#D32F2F',
+            },
+          ]}
+        >
+          {shedule?.picked_up ? 'Picked up' : 'Not picked up'}
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+
           ))}
         </View>
       </ScrollView>        

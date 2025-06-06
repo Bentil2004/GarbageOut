@@ -38,7 +38,6 @@ const Settings = () => {
   const confirmLogout = () => {
     setModalVisible(false);
     logout()
-   navigation.navigate('LogIn')
   };
 
   const cancelLogout = () => {
@@ -114,25 +113,27 @@ const Settings = () => {
       </ScrollView>
 
       <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>Are you sure you want to log out?</Text>
-            <View style={styles.modalButtons}>
-              <Pressable style={[styles.button, styles.buttonConfirm]} onPress={confirmLogout}>
-                <Text style={styles.textStyleRed}>Confirm</Text>
-              </Pressable>
-              <Pressable style={[styles.button, styles.buttonCancel]} onPress={cancelLogout}>
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
-      </Modal>
+  animationType="slide"
+  transparent={true}
+  visible={modalVisible}
+  onRequestClose={() => setModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalView}>
+      <Text style={styles.modalTitle}>Log Out</Text>
+      <Text style={styles.modalText}>Are you sure you want to log out?</Text>
+      <View style={styles.modalButtons}>
+        <Pressable style={[styles.button, styles.buttonCancel]} onPress={cancelLogout}>
+          <Text style={styles.buttonCancelText}>Cancel</Text>
+        </Pressable>
+        <Pressable style={[styles.button, styles.buttonConfirm]} onPress={confirmLogout}>
+          <Text style={styles.buttonConfirmText}>Log Out</Text>
+        </Pressable>
+      </View>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 };
@@ -194,54 +195,63 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    width: '80%',
-    height: 200,
-  },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
-  button: {
-    borderRadius: 10,
-    padding: 10,
-    elevation: 2,
-    minWidth: 115,
-    alignItems: 'center',
-  },
-  buttonConfirm: {
-    backgroundColor: 'red',
-  },
-  buttonCancel: {
-    backgroundColor: '#f0f0f0',
-  },
-  textStyle: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
-  textStyleRed: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+},
+modalView: {
+  backgroundColor: '#fff',
+  borderRadius: 15,
+  paddingVertical: 30,
+  paddingHorizontal: 25,
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 6,
+  elevation: 5,
+  width: '85%',
+},
+modalTitle: {
+  fontSize: 20,
+  fontWeight: '600',
+  marginBottom: 10,
+  color: '#333',
+},
+modalText: {
+  fontSize: 16,
+  color: '#555',
+  textAlign: 'center',
+  marginBottom: 25,
+},
+modalButtons: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+},
+button: {
+  borderRadius: 8,
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  elevation: 2,
+  minWidth: '45%',
+  alignItems: 'center',
+},
+buttonConfirm: {
+  backgroundColor: '#d9534f',
+},
+buttonCancel: {
+  backgroundColor: '#e0e0e0',
+},
+buttonConfirmText: {
+  color: '#fff',
+  fontWeight: '600',
+  fontSize: 16,
+},
+buttonCancelText: {
+  color: '#333',
+  fontWeight: '600',
+  fontSize: 16,
+},
 });

@@ -27,6 +27,9 @@ export const HomePage = StyleSheet.create({
     // borderBottomRightRadius: 20,
     position: "relative",
     height: 210,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
   greetingText: {
     fontSize: 22,
@@ -39,12 +42,6 @@ export const HomePage = StyleSheet.create({
     fontSize: 16,
     color: "white",
     marginTop: 0,
-  },
-  notificationIcon: {
-    position: "absolute",
-    top: -50,
-    right: 0,
-    color: "white",
   },
   statsContainer: {
     flexDirection: "row",
@@ -244,51 +241,68 @@ export const SchedulePage = StyleSheet.create({
     marginHorizontal: 20,
   },
   scheduleCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  binImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 15,
-  },
-  binDetails: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  scheduleDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  scheduleTime: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 4,
-  },
-  binInfo: {
-    fontSize: 12,
-    color: '#777',
-  },
-  binPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#34D186',
-  },
-  status: {
-    fontWeight: 'bold'
-  },
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  padding: 15,
+  borderRadius: 12,
+  marginBottom: 12,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.1,
+  shadowRadius: 3,
+  elevation: 2,
+},
+
+binImage: {
+  width: 60,
+  height: 60,
+  borderRadius: 10,
+  marginRight: 16,
+},
+
+binDetails: {
+  flex: 1,
+  justifyContent: 'center',
+},
+
+scheduleDate: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#222',
+  marginBottom: 4,
+},
+
+scheduleTime: {
+  fontSize: 14,
+  color: '#666',
+  marginBottom: 3,
+},
+
+binPrice: {
+  fontSize: 15,
+  fontWeight: '700',
+  color: '#2E7D4F',
+},
+
+priceStatusContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 10,
+},
+
+statusBadge: {
+  borderRadius: 20,
+  paddingVertical: 4,
+  paddingHorizontal: 12,
+},
+
+statusText: {
+  fontWeight: '600',
+  fontSize: 12,
+},
+
   scrollContainer: {
     flexGrow: 1,
   },
