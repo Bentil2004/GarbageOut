@@ -3,7 +3,7 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Support = ({ navigation }) => {
-  const phoneNum = '+233556805991';
+  const phoneNum = '+233531400882';
 
   const handleCall = () => {
     Linking.openURL(`tel:${phoneNum}`);

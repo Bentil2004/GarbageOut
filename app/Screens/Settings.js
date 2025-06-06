@@ -99,11 +99,11 @@ const Settings = () => {
           <MaterialCommunityIcons name="chevron-right" size={24} color="gray" style={styles.iconRight} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.row} onPress={onDeletePressed}>
+        {/* <TouchableOpacity style={styles.row} onPress={onDeletePressed}>
           <MaterialCommunityIcons name="trash-can-outline" size={24} color="gray" />
           <Text style={styles.optionText}>Delete Account</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="gray" style={styles.iconRight} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity style={styles.row} onPress={onLogoutPressed}>
           <MaterialCommunityIcons name="logout" size={24} color="gray" />

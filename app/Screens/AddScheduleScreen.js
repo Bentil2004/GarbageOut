@@ -184,8 +184,14 @@ const AddScheduleScreen = ({ route }) => {
   const fetchBins = async () => {
     setLoadingBins(true);
     try {
-      const response = await fetch(`${BASE_URL}core/bins/`);
+      const response = await fetch(`${BASE_URL}core/bins/`, {
+        headers: {
+          Authorization: `Bearer ${user?.access}`,
+        },
+      });
       const data = await response.json();
+      console.log("data", data);
+      
       setBins(data);
     } catch (error) {
       console.error("Error fetching bins:", error.message);
@@ -418,7 +424,7 @@ const AddScheduleScreen = ({ route }) => {
           <ActivityIndicator size="medium" color="#7C6DDD" />
         ) : (
           <View style={styles.binListContainer}>
-            {bins.map((bin) => (
+            {bins?.map((bin) => (
               <TouchableOpacity
                 key={bin.id}
                 style={[
