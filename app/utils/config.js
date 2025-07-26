@@ -1,2 +1,2 @@
-export const BASE_URL = "https://garbageout.pythonanywhere.com/"
+export const BASE_URL = "https://garbageoutapp.pythonanywhere.com/"
 
