@@ -37,6 +37,7 @@ const Navigation = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} /> 
+            <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="LogIn" component={LogIn} />  
             <Stack.Screen name="SetNewPassword" component={SetNewPassword} /> 
             <Stack.Screen name="Verification" component={Verification} />
@@ -56,7 +57,6 @@ const Navigation = () => {
             <Stack.Screen name="LanguageChange" component={LanguageChange} />
             <Stack.Screen name="Support" component={Support} />
             <Stack.Screen name="PaidSubs" component={PaidSubs} />
-            <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="Payment" component={Payment} />
             <Stack.Screen name="ForgotPasswordVerification" component={ForgotPasswordVerification} />
