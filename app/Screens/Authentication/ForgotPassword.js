@@ -8,9 +8,11 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Ionicons } from '@expo/vector-icons';
 import { BASE_URL } from '../../utils/config';
 
 const ForgotPasswordPhone = () => {
@@ -23,9 +25,9 @@ const ForgotPassword = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const validatePhone = (phone) => {
-  const phoneRegex = /^\+233\d{9}$/; // Ghana phone number: +233 followed by 9 digits
-  return phoneRegex.test(phone);
-};
+    const phoneRegex = /^\+233\d{9}$/; 
+    return phoneRegex.test(phone);
+  };
 
   const onContinuePressed = async () => {
     if (!validatePhone(phone)) {
@@ -34,9 +36,8 @@ const ForgotPassword = ({ navigation }) => {
     }
 
     setLoading(true);
-
     try {
-      const response = await fetch(BASE_URL+'accounts/request-password-reset/', {
+      const response = await fetch(BASE_URL + 'accounts/request-password-reset/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: String(phone) }),
@@ -46,131 +47,118 @@ const ForgotPassword = ({ navigation }) => {
         Alert.alert(
           'SMS Sent',
           `A password reset code has been sent to ${phone}.`,
-          [{ text: 'OK', onPress: () => navigation.navigate('SetNewPassword', { phone }) }]
+          [{ text: 'OK', onPress: () => navigation.navigate('ForgotPasswordVerification', { phone }) }]
         );
       } else {
         const data = await response.json();
         throw new Error(data || 'Request failed');
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       Alert.alert('Error', error.message || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
   };
 
-  const isPhoneEmpty = phone.length === 0;
-
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>Back</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="arrow-back-outline" size={28} color="#34D186" />
       </TouchableOpacity>
 
-      <View style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>Forgot Password</Text>
-        <Text style={styles.subtitle}>Enter your phone number to reset your password</Text>
-
-        <View style={styles.inputContainer}>
-          <Icon name="phone" size={20} color="#707070" style={styles.icon} />
-          <TextInput
-            placeholder="+233xxx"
-            placeholderTextColor="#707070"
-            style={styles.input}
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            autoCapitalize="none"
-          />
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.button,
-            isPhoneEmpty || loading ? styles.buttonInitial : styles.buttonFilled,
-          ]}
-          onPress={onContinuePressed}
-          disabled={isPhoneEmpty || loading}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Continue</Text>
-          )}
-        </TouchableOpacity>
+        <Text style={styles.subtitle}>Please enter your phone number to reset the password</Text>
       </View>
-    </SafeAreaView>
+
+      <View style={styles.inputContainer}>
+        <Ionicons name="call-outline" size={20} color="#34D186" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Phone"
+          placeholderTextColor="#A0A0A0"
+          keyboardType="phone-pad"
+          value={phone}
+          onChangeText={setPhone}
+        />
+      </View>
+
+      <TouchableOpacity
+        style={[styles.button, phone.length === 0 || loading ? styles.buttonDisabled : styles.buttonActive]}
+        onPress={onContinuePressed}
+        disabled={phone.length === 0 || loading}
+      >
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Proceed</Text>}
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
-    backgroundColor: '#ffffff',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 80,
+    justifyContent: 'center',
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: 150,
     left: 20,
   },
-  backButtonText: {
-    color: '#34D186',
-    fontSize: 20,
-    marginTop: 30,
-  },
-  container: {
-    marginTop: 80,
-    width: '80%',
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 20,
-    top: 20,
-    textAlign: 'left',
+    color: '#000',
+    marginBottom: 10,
   },
   subtitle: {
-    fontSize: 16,
-    color: 'gray',
-    marginBottom: 20,
-    top: 10,
-    textAlign: 'left',
+    fontSize: 14,
+    color: '#34D186',
+    textAlign: 'center',
   },
   inputContainer: {
-    width: '100%',
-    marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: '#34D186',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    height: 50,
+    marginBottom: 30,
   },
   icon: {
-    padding: 10,
+    marginRight: 8,
   },
   input: {
     flex: 1,
-    padding: 10,
+    fontSize: 16,
+    color: '#000',
   },
   button: {
-    width: '100%',
-    padding: 15,
-    borderRadius: 5,
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 30,
   },
-  buttonInitial: {
-    backgroundColor: '#A7F3D0',
-  },
-  buttonFilled: {
+  buttonActive: {
     backgroundColor: '#34D186',
   },
+  buttonDisabled: {
+    backgroundColor: '#A7F3D0',
+  },
   buttonText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
   },
 });
 

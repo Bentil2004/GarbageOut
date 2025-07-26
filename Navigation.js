@@ -26,6 +26,8 @@ import SignUp from "./app/Screens/Authentication/SignUp";
 import ForgotPassword from "./app/Screens/Authentication/ForgotPassword";
 import Payment from "./app/Screens/Payment";
 import SetNewPassword from "./app/Screens/Authentication/SetNewPassword.js";
+import ForgotPasswordVerification from "./app/Screens/Authentication/ForgotPasswordVerification.js";
+import ChangePassword from "./app/Screens/Authentication/ChangePassword.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +59,8 @@ const Navigation = () => {
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
             <Stack.Screen name="Payment" component={Payment} />
+            <Stack.Screen name="ForgotPasswordVerification" component={ForgotPasswordVerification} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
           </Stack.Navigator>
   );
 };
