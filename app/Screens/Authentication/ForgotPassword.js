@@ -92,7 +92,7 @@ const ForgotPassword = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back-outline" size={28} color="#34D186" />
+        <Ionicons name="arrow-back-outline" size={28} color="#55A57F" />
       </TouchableOpacity>
 
       <View style={styles.header}>
@@ -148,14 +148,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    // color: '#34D186',
+    // color: '#55A57F',
     textAlign: 'center',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderRadius: 12,
     paddingHorizontal: 10,
     height: 50,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonActive: {
-    backgroundColor: '#34D186',
+    backgroundColor: '#55A57F',
   },
   buttonDisabled: {
     backgroundColor: '#A7F3D0',

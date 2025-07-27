@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     color: '#FF9800',
   },
   paid: {
-    color: '#34D186',
+    color: '#55A57F',
   },
   scheduleCard: {
   flexDirection: 'row',

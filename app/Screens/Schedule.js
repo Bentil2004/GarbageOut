@@ -157,7 +157,7 @@ const Schedule = () => {
     <View style={styles.priceStatusContainer}>
       <Text style={styles.binPrice}>{`GHC ${shedule?.price}`}</Text>
 
-      <View
+      {shedule.has_payed?<View
         style={[
           styles.statusBadge,
           {
@@ -175,7 +175,27 @@ const Schedule = () => {
         >
           {shedule?.picked_up ? 'Picked up' : 'Not picked up'}
         </Text>
+      </View> : 
+      <View
+        style={[
+          styles.statusBadge,
+          {
+            backgroundColor: shedule?.has_payed ? '#DFF3EB' : '#FFE3E3',
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.statusText,
+            {
+              color: shedule?.picked_up ? '#2E7D4F' : '#D32F2F',
+            },
+          ]}
+        >
+          {shedule?.has_payed ? 'Paid' : 'Not Paid'}
+        </Text>
       </View>
+      }
     </View>
   </View>
 </View>

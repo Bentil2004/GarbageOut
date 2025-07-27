@@ -53,6 +53,8 @@ const MobileMoneyPayment = ({
       const data = await response.json();
 
       if (!response.ok) {
+        console.log(data);
+        
         throw new Error(data || "Payment initiation failed");
       }
 
@@ -60,9 +62,9 @@ const MobileMoneyPayment = ({
       setPhone("");
       onSuccess?.(data);
     } catch (error) {
-      console.error("Payment Error:", error);
+      console.error("Payment Error:", error?.message);
       onCancel?.(error);
-      Alert.alert("Payment Failed", error.message || "Something went wrong");
+      Alert.alert("Payment Failed", "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -106,12 +108,12 @@ const MobileMoneyPayment = ({
               <View style={modalStyles.buttonRow}>
                 <TouchableOpacity
     style={[modalStyles.modalButton, { backgroundColor: "#aaa" }]}
-    onPress={() => setIsVisible(false)}
+    onPress={() => {setIsVisible(false); setPhone("")}}
   >
     <Text style={[modalStyles.buttonText, { color: "#fff" }]}>Cancel</Text>
   </TouchableOpacity>
   <TouchableOpacity
-    style={[modalStyles.modalButton, { backgroundColor: "#34D186" }]}
+    style={[modalStyles.modalButton, { backgroundColor: "#55A57F" }]}
     onPress={handleSubmit}
   >
     <Text style={modalStyles.buttonText}>Submit</Text>

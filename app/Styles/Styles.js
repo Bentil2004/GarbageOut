@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 
 const colors = {
-  primary: "#34D186",
+  primary: "#55A57F",
   secondary: "#7C6DDD",
   dark: "#333",
   white: "#fff",
@@ -9,7 +9,7 @@ const colors = {
   lightGray: "#F2F2F2",
   border: "#ddd",
   error: "#FF0000",
-  button: "#34D186",
+  button: "#55A57F",
   black: "#000000",
 };
 
@@ -201,7 +201,7 @@ binPrice: {
 export const SchedulePage = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     marginBottom: 80,
   },
   header: {
@@ -464,7 +464,7 @@ export const ScheduleScreen = StyleSheet.create({
     borderRadius: 10,
   },
   selectedBin: {
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderWidth: 2,
   },
   binImage: {
@@ -511,7 +511,7 @@ export const ScheduleScreen = StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    color: '#34D186',
+    color: '#55A57F',
     fontWeight: 'bold',
     marginTop: 10,
   },

@@ -190,7 +190,6 @@ const AddScheduleScreen = ({ route }) => {
         },
       });
       const data = await response.json();
-      console.log("data", data);
       
       setBins(data);
     } catch (error) {
@@ -274,6 +273,7 @@ const AddScheduleScreen = ({ route }) => {
     fetchPickup();
     fetchDurations();
     fetchBins();
+    
   }, []);
 
   useEffect(() => {
@@ -424,7 +424,7 @@ const AddScheduleScreen = ({ route }) => {
           <ActivityIndicator size="medium" color="#7C6DDD" />
         ) : (
           <View style={styles.binListContainer}>
-            {bins?.map((bin) => (
+            {bins && bins?.map((bin) => (
               <TouchableOpacity
                 key={bin.id}
                 style={[
@@ -440,7 +440,7 @@ const AddScheduleScreen = ({ route }) => {
                   style={styles.binImage}
                 />
                 <View style={styles.binDetails}>
-                  <Text style={styles.binName}>Bin Size: {bin.size}</Text>
+                  <Text style={styles.binName}>Bin Size: {bin.size}Kg</Text>
                   <Text style={styles.price}>
                     GHC {bin.price * (quantities[bin.id] || 1)}
                   </Text>

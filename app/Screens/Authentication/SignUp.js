@@ -224,7 +224,7 @@ const SignUpScreen = () => {
           <CustomButton
             text={loading ? "Processing..." : "Submit"}
             onPress={handleSignUp}
-            bg="#34D186"
+            bg="#55A57F"
             txt="white"
             disabled={loading}
           />
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   link: {
-    color: "#34D186",
+    color: "#55A57F",
   },
   passwordInputContainer: {
     flexDirection: "row",
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#34D186",
+    borderColor: "#55A57F",
     borderRadius: 10,
     paddingHorizontal: 20,
     height: 60,

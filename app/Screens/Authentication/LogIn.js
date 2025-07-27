@@ -90,7 +90,7 @@ const LogIn = () => {
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        Alert.alert("Error", errorData.datail[0] || "Something went wrong.");
+        Alert.alert("Error", errorData.detail || "Something went wrong.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -160,7 +160,7 @@ const LogIn = () => {
             <CustomButton
               onPress={handleLogin}
               text={loading ? "Processing..." : "Log In"}
-              bg="#34D186"
+              bg="#55A57F"
               txt="white"
               disabled={loading}
             />
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     top: 25,
   },
   link: {
-    color: "#34D186",
+    color: "#55A57F",
     alignSelf: "flex-end",
     marginBottom: 0,
     marginTop: 10,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   phoneInput: {
     width: "100%",
     height: 60,
-    borderColor: "#34D186",
+    borderColor: "#55A57F",
     borderWidth: 1,
     borderRadius: 10,
     marginBottom: 10,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#34D186",
+    borderColor: "#55A57F",
     borderRadius: 10,
     paddingHorizontal: 20,
     height: 60,

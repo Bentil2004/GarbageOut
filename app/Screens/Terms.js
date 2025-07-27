@@ -26,20 +26,20 @@ const TermsAndConditions = ({ navigation }) => {
         
         <Text style={styles.subheading}>Definitions</Text>
         <Text style={styles.paragraph}>For the purposes of these Terms and Conditions:</Text>
-        <Text style={styles.listItem}>• Application means the software program provided by the Company downloaded by You on any electronic device, named AeroKonnect</Text>
+        <Text style={styles.listItem}>• Application means the software program provided by Oval Technologies downloaded by You on any electronic device, named GarbageOut</Text>
         <Text style={styles.listItem}>• Application Store means the digital distribution service operated and developed by Apple Inc. (Apple App Store) or Google Inc. (Google Play Store) in which the Application has been downloaded.</Text>
         <Text style={styles.listItem}>• Affiliate means an entity that controls, is controlled by or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</Text>
         <Text style={styles.listItem}>• Country refers to: Ghana</Text>
-        <Text style={styles.listItem}>• Company (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to AeroKonnect.</Text>
+        <Text style={styles.listItem}>• Company (referred to as either "Oval Technologies", "We", "Us" or "Our" in this Agreement) refers to GarbageOut.</Text>
         <Text style={styles.listItem}>• Device means any device that can access the Service such as a computer, a cellphone or a digital tablet.</Text>
         <Text style={styles.listItem}>• Service refers to the Application.</Text>
-        <Text style={styles.listItem}>• Terms and Conditions (also referred as "Terms") mean these Terms and Conditions that form the entire agreement between You and the Company regarding the use of the Service.</Text>
+        <Text style={styles.listItem}>• Terms and Conditions (also referred as "Terms") mean these Terms and Conditions that form the entire agreement between You and Oval Technologies regarding the use of the Service.</Text>
         <Text style={styles.listItem}>• Third-party Social Media Service means any services or content (including data, information, products or services) provided by a third-party that may be displayed, included or made available by the Service.</Text>
-        <Text style={styles.listItem}>• You means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</Text>
+        <Text style={styles.listItem}>• You means the individual accessing or using the Service, or Oval Technologies, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</Text>
 
         <Text style={styles.heading}>Acknowledgment</Text>
         <Text style={styles.paragraph}>
-          These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and the Company. 
+          These are the Terms and Conditions governing the use of this Service and the agreement that operates between You and Oval Technologies. 
           These Terms and Conditions set out the rights and obligations of all users regarding the use of the Service.
         </Text>
         <Text style={styles.paragraph}>
@@ -49,20 +49,20 @@ const TermsAndConditions = ({ navigation }) => {
         <Text style={styles.paragraph}>
           By accessing or using the Service You agree to be bound by these Terms and Conditions. If You disagree with any part of these Terms and Conditions then You may not access the Service.
         </Text>
-        <Text style={styles.paragraph}>You represent that you are over the age of 18. The Company does not permit those under 18 to use the Service.</Text>
+        <Text style={styles.paragraph}>You represent that you are over the age of 18. Oval Technologies does not permit those under 18 to use the Service.</Text>
         <Text style={styles.paragraph}>
-          Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of the Company. 
+          Your access to and use of the Service is also conditioned on Your acceptance of and compliance with the Privacy Policy of Oval Technologies. 
           Our Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your personal information when You use the Application or the Website and tells You about Your privacy rights and how the law protects You. 
           Please read Our Privacy Policy carefully before using Our Service.
         </Text>
 
         <Text style={styles.heading}>Links to Other Websites</Text>
         <Text style={styles.paragraph}>
-          Our Service may contain links to third-party web sites or services that are not owned or controlled by the Company.
+          Our Service may contain links to third-party web sites or services that are not owned or controlled by Oval Technologies.
         </Text>
         <Text style={styles.paragraph}>
-          The Company has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. 
-          You further acknowledge and agree that the Company shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with the use of or reliance on any such content, goods or services available on or through any such web sites or services.
+          Oval Technologies has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. 
+          You further acknowledge and agree that Oval Technologies shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with the use of or reliance on any such content, goods or services available on or through any such web sites or services.
         </Text>
         <Text style={styles.paragraph}>
           We strongly advise You to read the terms and conditions and privacy policies of any third-party web sites or services that You visit.
@@ -76,12 +76,12 @@ const TermsAndConditions = ({ navigation }) => {
 
         <Text style={styles.heading}>Limitation of Liability</Text>
         <Text style={styles.paragraph}>
-          Notwithstanding any damages that You might incur, the entire liability of the Company and any of its suppliers under any provision of this Terms and Your exclusive remedy for all of the foregoing shall be limited to the amount actually paid by You through the Service or 100 USD if You haven't purchased anything through the Service.
+          Notwithstanding any damages that You might incur, the entire liability of Oval Technologies and any of its suppliers under any provision of this Terms and Your exclusive remedy for all of the foregoing shall be limited to the amount actually paid by You through the Service or 100 USD if You haven't purchased anything through the Service.
         </Text>
         <Text style={styles.paragraph}>
-          To the maximum extent permitted by applicable law, in no event shall the Company or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever 
+          To the maximum extent permitted by applicable law, in no event shall Oval Technologies or its suppliers be liable for any special, incidental, indirect, or consequential damages whatsoever 
           (including, but not limited to, damages for loss of profits, loss of data or other information, for business interruption, for personal injury, loss of privacy arising out of or in any way related to the use of or inability to use the Service, third-party software and/or third-party hardware used with the Service, or otherwise in connection with any provision of this Terms), 
-          even if the Company or any supplier has been advised of the possibility of such damages and even if the remedy fails of its essential purpose.
+          even if Oval Technologies or any supplier has been advised of the possibility of such damages and even if the remedy fails of its essential purpose.
         </Text>
         <Text style={styles.paragraph}>
           Some states do not allow the exclusion of implied warranties or limitation of liability for incidental or consequential damages, 
@@ -91,18 +91,18 @@ const TermsAndConditions = ({ navigation }) => {
         <Text style={styles.heading}>"AS IS" and "AS AVAILABLE" Disclaimer</Text>
         <Text style={styles.paragraph}>
           The Service is provided to You "AS IS" and "AS AVAILABLE" and with all faults and defects without warranty of any kind. 
-          To the maximum extent permitted under applicable law, the Company, on its own behalf and on behalf of its Affiliates and its and their respective licensors and service providers, 
+          To the maximum extent permitted under applicable law, Oval Technologies, on its own behalf and on behalf of its Affiliates and its and their respective licensors and service providers, 
           expressly disclaims all warranties, whether express, implied, statutory or otherwise, with respect to the Service, 
           including all implied warranties of merchantability, fitness for a particular purpose, title and non-infringement, and warranties that may arise out of course of dealing, course of performance, usage or trade practice. 
-          Without limitation to the foregoing, the Company provides no warranty or undertaking, and makes no representation of any kind that the Service will meet Your requirements, achieve any intended results, 
+          Without limitation to the foregoing, Oval Technologies provides no warranty or undertaking, and makes no representation of any kind that the Service will meet Your requirements, achieve any intended results, 
           be compatible or work with any other software, applications, systems or services, operate without interruption, meet any performance or reliability standards or be error free or that any errors or defects can or will be corrected.
         </Text>
         <Text style={styles.paragraph}>
-          Without limiting the foregoing, neither the Company nor any of the company's provider makes any representation or warranty of any kind, express or implied: 
+          Without limiting the foregoing, neither Oval Technologies nor any of Oval Technologies's provider makes any representation or warranty of any kind, express or implied: 
           (i) as to the operation or availability of the Service, or the information, content, and materials or products included thereon; 
           (ii) that the Service will be uninterrupted or error-free; 
           (iii) as to the accuracy, reliability, or currency of any information or content provided through the Service; or 
-          (iv) that the Service, its servers, the content, or e-mails sent from or on behalf of the Company are free of viruses, scripts, trojan horses, worms, malware, timebombs or other harmful components.
+          (iv) that the Service, its servers, the content, or e-mails sent from or on behalf of Oval Technologies are free of viruses, scripts, trojan horses, worms, malware, timebombs or other harmful components.
         </Text>
         <Text style={styles.paragraph}>
           Some jurisdictions do not allow the exclusion of certain types of warranties or limitations on applicable statutory rights of a consumer, 
@@ -117,7 +117,7 @@ const TermsAndConditions = ({ navigation }) => {
 
         <Text style={styles.heading}>Disputes Resolution</Text>
         <Text style={styles.paragraph}>
-          If You have any concern or dispute about the Service, You agree to first try to resolve the dispute informally by contacting the Company.
+          If You have any concern or dispute about the Service, You agree to first try to resolve the dispute informally by contacting Oval Technologies.
         </Text>
 
         <Text style={styles.heading}>For European Union (EU) Users</Text>

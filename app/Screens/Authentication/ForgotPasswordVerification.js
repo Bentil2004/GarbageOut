@@ -130,7 +130,7 @@ const ForgotPasswordVerification = ({ route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back-outline" size={28} color="#34D186" />
+        <Ionicons name="arrow-back-outline" size={28} color="#55A57F" />
       </TouchableOpacity>
 
       <View style={styles.header}>
@@ -181,7 +181,7 @@ const ForgotPasswordVerification = ({ route }) => {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={canResend ? resend : null} disabled={!canResend || resendLoading}>
-        <Text style={[styles.resendText, { color: canResend ? "#34D186" : "#ccc" }]}>
+        <Text style={[styles.resendText, { color: canResend ? "#55A57F" : "#ccc" }]}>
           {resendLoading
             ? "Sending..."
             : canResend
@@ -229,14 +229,14 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderWidth: 1,
-    borderColor: "#34D186",
+    borderColor: "#55A57F",
     borderRadius: 8,
     textAlign: "center",
     fontSize: 20,
     color: "#000",
   },
   verifyButton: {
-    backgroundColor: "#34D186",
+    backgroundColor: "#55A57F",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",

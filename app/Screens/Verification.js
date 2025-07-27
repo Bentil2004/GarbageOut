@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   editNumberText: {
-    color: '#34D186',
+    color: '#55A57F',
     fontSize: 15, 
     marginBottom: 20,
   },
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     borderWidth: 2,
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderRadius: 10, 
     marginHorizontal: 3, 
     backgroundColor: '#f5f5f5',
@@ -192,11 +192,11 @@ const styles = StyleSheet.create({
     fontSize: 14, 
   },
   resendText: {
-    color: '#34D186',
+    color: '#55A57F',
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#34D186',
+    backgroundColor: '#55A57F',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

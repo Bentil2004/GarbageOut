@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
 
     valueprice: {
-    color: '#34D186',
+    color: '#55A57F',
     fontWeight: 'bold',
     fontSize: 16,
   },

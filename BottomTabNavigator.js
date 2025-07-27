@@ -39,7 +39,7 @@ const BottomTabNavigator = () => {
           return <MaterialCommunityIcons name={iconName} size={size} color={color} />;
         },
         headerShown: false,
-        tabBarActiveTintColor: '#34D186',
+        tabBarActiveTintColor: '#55A57F',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
           backgroundColor: '#fff',

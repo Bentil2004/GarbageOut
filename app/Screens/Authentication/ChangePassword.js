@@ -62,7 +62,7 @@ const ChangePassword = ({ route }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back-outline" size={28} color="#34D186" />
+        <Ionicons name="arrow-back-outline" size={28} color="#55A57F" />
       </TouchableOpacity>
 
       <View style={styles.header}>
@@ -82,7 +82,7 @@ const ChangePassword = ({ route }) => {
           onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color="#34D186" />
+          <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color="#55A57F" />
         </TouchableOpacity>
       </View>
 
@@ -96,7 +96,7 @@ const ChangePassword = ({ route }) => {
           onChangeText={setConfirmPassword}
         />
         <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-          <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color="#34D186" />
+          <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color="#55A57F" />
         </TouchableOpacity>
       </View>
 
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#34D186',
+    color: '#55A57F',
     textAlign: 'center',
     paddingHorizontal: 20,
   },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderRadius: 12,
     paddingHorizontal: 10,
     height: 50,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonActive: {
-    backgroundColor: '#34D186',
+    backgroundColor: '#55A57F',
   },
   buttonDisabled: {
     backgroundColor: '#A7F3D0',

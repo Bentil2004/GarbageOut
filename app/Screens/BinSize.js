@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   selectedBin: {
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderWidth: 2,
   },
   binImage: {
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#34D186',
+    color: '#55A57F',
     marginTop: 5,
   },
   quantityContainer: {

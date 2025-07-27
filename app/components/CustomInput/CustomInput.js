@@ -7,7 +7,7 @@ const CustomInput = ({
   value,
   onChangeText,
   secureTextEntry,
-  bordercolor = "#34D186",
+  bordercolor = "#55A57F",
   borderRadius = 10,
   iconName,
 }) => {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#34D186",
+    borderColor: "#55A57F",
     borderRadius: 10,
     width: "100%", 
     height: 60, 

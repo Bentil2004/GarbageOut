@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   phoneInput: {
     width: '100%',
     height: 60,
-    borderColor: '#34D186',
+    borderColor: '#55A57F',
     borderWidth: 1,
     borderRadius: 10,
   },
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   button: {
-    backgroundColor: '#34D186',
+    backgroundColor: '#55A57F',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',

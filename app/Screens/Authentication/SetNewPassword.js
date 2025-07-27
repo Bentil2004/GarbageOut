@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     left: 20,
   },
   backButtonText: {
-    color: '#34D186',
+    color: '#55A57F',
     fontSize: 20,
     marginTop: 30,
   },
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonEnabled: {
-    backgroundColor: '#34D186',
+    backgroundColor: '#55A57F',
   },
   buttonDisabled: {
     backgroundColor: '#A7F3D0',
