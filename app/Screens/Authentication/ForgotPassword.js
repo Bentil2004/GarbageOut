@@ -24,38 +24,63 @@ const ForgotPassword = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const validatePhone = (phone) => {
-    const phoneRegex = /^\+233\d{9}$/; 
-    return phoneRegex.test(phone);
+  const validatePhone = () => {
+    let valid = true;
+
+  let formattedPhone = phone;
+  if (phone.startsWith("0")) {
+    formattedPhone = "+233" + phone.slice(1);
+  }
+
+  if (!formattedPhone.startsWith("+233") || formattedPhone.length !== 13) {
+    valid = false;
+  } else {
+    setPhone(formattedPhone);
+  }
+  return valid
   };
 
   const onContinuePressed = async () => {
-    if (!validatePhone(phone)) {
-      Alert.alert('Invalid Phone', 'Please enter a valid phone number.');
+    if (!validatePhone()) {
+      Alert.alert('Invalid Phone', 'Please enter a valid phone number starting with +233.');
       return;
     }
 
+    let formattedPhone = phone;
+  if (phone.startsWith("0")) {
+    formattedPhone = "+233" + phone.slice(1);
+  }
+
+  if (!formattedPhone.startsWith("+233") || formattedPhone.length !== 13) {
+      Alert.alert('Invalid Phone', 'Please enter a valid phone number starting with +233.');
+      return
+  } else {
+    setPhone(formattedPhone);
+  }
+
     setLoading(true);
+    
     try {
       const response = await fetch(BASE_URL + 'accounts/request-password-reset/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: String(phone) }),
+        body: JSON.stringify({ phone: String(formattedPhone) }),
       });
 
       if (response.ok) {
         Alert.alert(
           'SMS Sent',
           `A password reset code has been sent to ${phone}.`,
-          [{ text: 'OK', onPress: () => navigation.navigate('ForgotPasswordVerification', { phone }) }]
+          [{ text: 'OK', onPress: () => navigation.navigate('ForgotPasswordVerification', { phoneNumber: formattedPhone }) }]
         );
       } else {
         const data = await response.json();
-        throw new Error(data || 'Request failed');
+        console.log(data);
+      Alert.alert('Error', data.phone[0] || 'Something went wrong.');
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', error.message || 'Something went wrong.');
+      Alert.alert('Error', error.phone[0] || 'Something went wrong.');
     } finally {
       setLoading(false);
     }
@@ -76,7 +101,7 @@ const ForgotPassword = ({ navigation }) => {
       </View>
 
       <View style={styles.inputContainer}>
-        <Ionicons name="call-outline" size={20} color="#34D186" style={styles.icon} />
+                  <Ionicons name="call" size={24} color="#7D7D7D" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Phone"
@@ -104,11 +129,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingTop: 80,
-    justifyContent: 'center',
+    // justifyContent: 'cen',
   },
   backButton: {
     position: 'absolute',
-    top: 150,
+    top: 80,
     left: 20,
   },
   header: {
@@ -123,7 +148,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#34D186',
+    // color: '#34D186',
     textAlign: 'center',
   },
   inputContainer: {

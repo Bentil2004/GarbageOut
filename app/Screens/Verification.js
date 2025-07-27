@@ -16,24 +16,24 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
 
 
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
-  const [timer, setTimer] = useState(60);
+  // const [timer, setTimer] = useState(60);
   const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0)
+  // const [count, setCount] = useState(0)
 
   const inputRefs = useRef([]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prevTimer) => {
-        if (prevTimer === 0) {
-          clearInterval(interval);
-        }
-        return prevTimer > 0 ? prevTimer - 1 : 0;
-      });
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimer((prevTimer) => {
+  //       if (prevTimer === 0) {
+  //         clearInterval(interval);
+  //       }
+  //       return prevTimer > 0 ? prevTimer - 1 : 0;
+  //     });
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, [count]);
+  //   return () => clearInterval(interval);
+  // }, [count]);
 
   const handleVerificationCodeChange = (index, value) => {
     const newVerificationCode = [...verificationCode];
@@ -53,12 +53,12 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     setLoading(true);
 
     const data = {
-      phone: `+233${phoneNumber}`,
+      phone: `${phoneNumber}`,
       code: verificationCode.join(""),
     };
 
     try {
-      console.log("Sending request:", data); // Debugging log
+      console.log("Sending request:", data);
       const url = `${BASE_URL}accounts/verify-phone-number/`;
 
       const response = await fetch(url, {
@@ -72,7 +72,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
       if (response.ok) {
         const responseData = await response.json();
         console.log("Response:", responseData)
-        Alert.alert("Success", "PhoneNumber verification successful. Proceed to login");
+        Alert.alert("Success", "Phone number verification successful. Proceed to login");
         navigation.navigate("LogIn");
       } else {
         const errorData = await response.json();
@@ -88,11 +88,11 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
 };
 
 
-  const handleResend = () => {
-    console.warn("Resend verification code");
-    setTimer(60);
-    setCount(prev=> prev + 1)
-  };
+  // const handleResend = () => {
+  //   console.warn("Resend verification code");
+  //   setTimer(60);
+  //   setCount(prev=> prev + 1)
+  // };
 
   const onEditPressed = () => {
     navigation.navigate("SignUp");
@@ -106,7 +106,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
     >
       <Text style={styles.title}>Enter code</Text>
       <Text style={styles.subtitle}>
-        An SMS code was sent to <Text style={styles.num}>{`+233${phoneNumber}`}</Text>
+        An SMS code was sent to <Text style={styles.num}>{`${phoneNumber}`}</Text>
       </Text>
 
       <TouchableOpacity onPress={onEditPressed}>
@@ -128,7 +128,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.timer}>
+        {/* <Text style={styles.timer}>
           {timer === 0 ? (
             <TouchableOpacity onPress={handleResend}>
               <Text style={styles.resendText}>Resend</Text>
@@ -136,7 +136,7 @@ const PhoneNumberVerificationScreen = ({ route, navigation }) => {
           ) : (
             `Resend code in ${timer} seconds`
           )}
-        </Text>
+        </Text> */}
 
         <TouchableOpacity disabled={loading} style={styles.button} onPress={handleVerifyCode}>
           <Text style={styles.buttonText}>{loading ? "Processing..." : "Submit"}</Text>

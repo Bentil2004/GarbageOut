@@ -8,21 +8,37 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { BASE_URL } from "../../utils/config";
+import CustomInput from "../../components/CustomInput";
+import { useNavigation } from "@react-navigation/native";
 
-const ForgotPasswordVerification = ({ route, navigation }) => {
-  const { phoneNumber } = route.params || {}; 
+const ForgotPasswordVerification = ({ route }) => {
+  const { phoneNumber } = route.params || {};
+    const navigation = useNavigation();
+  
 
-  const [verificationCode, setVerificationCode] = useState([
-    "",
-    "",
-    "",
-    "",
-    "",
-    ]);
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+    const [password, setPassword] = useState("");
   const inputRefs = useRef([]);
+    const [showPassword, setShowPassword] = useState(false);
+  const toggleVisibility = () => setShowPassword((prev) => !prev);
+
+  useEffect(() => {
+    let timer;
+    if (resendTimer > 0) {
+      timer = setTimeout(() => setResendTimer((prev) => prev - 1), 1000);
+    } else {
+      setCanResend(true);
+    }
+    return () => clearTimeout(timer);
+  }, [resendTimer]);
 
   const handleVerificationCodeChange = (index, value) => {
     const newCode = [...verificationCode];
@@ -34,15 +50,78 @@ const ForgotPasswordVerification = ({ route, navigation }) => {
     }
   };
 
-  const handleVerifyCode = () => {
-    setLoading(true);
-    const code = verificationCode.join("");
-    console.log("Verification Code:", code);
+  const handleVerifyCode = async () => {
+  const code = verificationCode.join("");
+  if (!password || !code) {
+    Alert.alert("Error", "Please enter code and new password");
+    } 
 
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate("ChangePassword", { phoneNumber });
-    }, 1000);
+  const formattedPhone =
+    phoneNumber.startsWith("0")
+      ? "+233" + phoneNumber.slice(1)
+      : phoneNumber;
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${BASE_URL}accounts/confirm-password-reset/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        phone: formattedPhone,
+        code: code,
+        new_password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      Alert.alert("Success", "Password has been reset.");
+      navigation.navigate("Login");
+    } else {
+      console.log("Reset error:", data);
+      Alert.alert("Error", data?.detail || "Invalid code or password.");
+    }
+  } catch (error) {
+    console.error("Network error:", error);
+    Alert.alert("Error", "Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+  const resend = async () => {
+
+    setResendLoading(true);
+    setCanResend(false);
+    setResendTimer(60);
+
+    try {
+      
+      const response = await fetch(`${BASE_URL}accounts/request-password-reset/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phoneNumber }),
+      });
+
+      if (response.ok) {
+        Alert.alert("SMS Sent", `A password reset code has been sent to ${phoneNumber}.`);
+      } else {
+        const data = await response.json();
+        console.log(data);
+        
+        throw new Error(data?.detail || "Request failed");
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Error", error.message || "Something went wrong.");
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -50,10 +129,7 @@ const ForgotPasswordVerification = ({ route, navigation }) => {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back-outline" size={28} color="#34D186" />
       </TouchableOpacity>
 
@@ -78,6 +154,24 @@ const ForgotPasswordVerification = ({ route, navigation }) => {
         ))}
       </View>
 
+      <View style={styles.passwordContainer}>
+            <CustomInput
+              placeholder="New Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              borderColor={"#ccc"}
+              iconName="lock-closed"
+            />
+            <MaterialCommunityIcons
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#7D7D7D"
+              style={styles.eyeIcon}
+              onPress={toggleVisibility}
+            />
+          </View>
+
       <TouchableOpacity style={styles.verifyButton} onPress={handleVerifyCode}>
         {loading ? (
           <ActivityIndicator color="#fff" />
@@ -86,8 +180,14 @@ const ForgotPasswordVerification = ({ route, navigation }) => {
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity>
-        <Text style={styles.resendText}>Resend Code</Text>
+      <TouchableOpacity onPress={canResend ? resend : null} disabled={!canResend || resendLoading}>
+        <Text style={[styles.resendText, { color: canResend ? "#34D186" : "#ccc" }]}>
+          {resendLoading
+            ? "Sending..."
+            : canResend
+            ? "Resend Code"
+            : `Resend in ${resendTimer}s`}
+        </Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -102,7 +202,7 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: 100,
+    top: 80,
     left: 20,
   },
   header: {
@@ -123,7 +223,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: 10,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   otpInput: {
     width: 50,
@@ -149,9 +249,19 @@ const styles = StyleSheet.create({
   },
   resendText: {
     textAlign: "center",
-    color: "#34D186",
     fontSize: 14,
     textDecorationLine: "underline",
+    marginTop: 10,
+  },
+  passwordContainer: {
+    position: "relative",
+    marginBottom: 20,
+    marginHorizontal:10
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 20,
+    top: 25,
   },
 });
 
