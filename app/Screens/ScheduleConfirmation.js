@@ -88,7 +88,7 @@ const ScheduleConfirmation = ({ route }) => {
             <View key={index} style={styles.binDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Bin size:</Text>
-                <Text style={styles.value}>{getBinSize(bin?.trash_bin)}</Text>
+                <Text style={styles.value}>{getBinSize(bin?.trash_bin)} Kg</Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.label}>Quantity:</Text>

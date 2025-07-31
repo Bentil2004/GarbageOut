@@ -61,18 +61,19 @@ const MobileMoneyPayment = ({
       setIsVisible(false);
       setPhone("");
       onSuccess?.(data);
-      Alert.alert(
-      "Payment Initiated",
-      "A prompt has been sent to your mobile money number. Kindly approve the transaction to complete your schedule payment.",
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.navigate("Schedule");
-          },
-        },
-      ]
-    );
+    //   Alert.alert(
+    //   "Payment Initiated",
+    //   "A prompt has been sent to your mobile money number. Kindly approve the transaction to complete your schedule payment.",
+    //   [
+    //     {
+    //       text: "OK",
+    //       onPress: () => {
+    //         navigation.navigate("Schedule");
+    //       },
+    //     },
+    //   ]
+    // );
+            navigation.goBack();
     } catch (error) {
       console.error("Payment Error:", error?.message);
       onCancel?.(error);
