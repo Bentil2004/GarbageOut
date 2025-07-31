@@ -116,9 +116,9 @@ const Payment = () => {
   onPress={() => {
     const isActuallyPaidOrPending =
       item?.has_payed === true &&
-      (item?.payment_status === "success" || item?.payment_status === "pending");
+      (item?.payment_status === "successfull" || item?.payment_status === "pending");
 
-    if (isActuallyPaidOrPending) {
+    if (isActuallyPaidOrPending || item.picked_up) {
       navigation.navigate("PaidSubs", { data: item });
     } else {
       navigation.navigate("ScheduleConfirmation", { data: item });

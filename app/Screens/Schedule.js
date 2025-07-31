@@ -132,11 +132,13 @@ const Schedule = () => {
               <TouchableOpacity
   key={shedule?.schedule_id}
   onPress={() => {
+    console.log(shedule.picked_up);
+    
     const isActuallyPaidOrPending =
       shedule?.has_payed === true &&
-      (shedule?.payment_status === "success" || shedule?.payment_status === "pending");
+      (shedule?.payment_status === "successfull" || shedule?.payment_status === "pending");
 
-    if (isActuallyPaidOrPending) {
+    if (isActuallyPaidOrPending || shedule.picked_up) {
       navigation.navigate("PaidSubs", { data: shedule });
     } else {
       navigation.navigate("ScheduleConfirmation", { data: shedule });
