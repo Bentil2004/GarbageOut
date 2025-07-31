@@ -350,7 +350,7 @@ const AddScheduleScreen = ({ route }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>
-                Please stand at the pickup point
+                Please be around pickup point
               </Text>
               <Text
                 style={{
@@ -368,7 +368,7 @@ const AddScheduleScreen = ({ route }) => {
                 value={name}
                 onChangeText={setName}
               />
-              <LocationButton setUserLocation={setAddress} />
+              <LocationButton stop={isModalVisible} setUserLocation={setAddress} />
               <View style={styles.ModalSubCancel}>
                 <TouchableOpacity
                   style={styles.modalButton}

@@ -86,67 +86,85 @@ const Payment = () => {
 };
 
 
-  const renderPaymentItem = ({ item }) => (
-  <TouchableOpacity 
-    key={item?.schedule_id} 
-    style={styles.scheduleCard}
-    onPress={() => {
-      if (item?.has_payed !== true) {
-        navigation.navigate('ScheduleConfirmation', { data: item });
-      } else {
-        navigation.navigate('PaidSubs', { data: item });
-      }
-    }}
-  >
-    <Image source={require('../assets/schedule.png')} style={styles.binImage} />
-    
-    <View style={styles.binDetails}>
-      <View style={{display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-  <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
-  <Text style={styles.updatedText}>
-    {formatDate(item.last_updated)}
-    </Text>
-  </View>
-  <Text style={styles.scheduleTime}>{item?.subscription?.subscription_name}</Text>
+  const renderPaymentItem = ({ item }) => {
+  const getStatusText = () => {
+    if (item.has_payed && item.payment_status === "successfull") return "Paid";
+    if (item.has_payed && item.payment_status === "pending") return "Pending";
+    if (item.has_payed && item.payment_status === "failed") return "Failed";
+    return "Not Paid";
+  };
 
-  {item?.subscription?.schedules?.length > 0 && (
-    <Text style={styles.scheduleTime}>
-      Pickup date on{" "}
-      {item.subscription.schedules.map((schedule, idx) => (
-        <Text key={schedule.id}>
-          {schedule.day_of_the_month}
-          {getOrdinalSuffix(schedule.day_of_the_month)}
-          {idx < item.subscription.schedules.length - 1 ? ", " : ""}
+  const getStatusColor = () => {
+    if (item.has_payed && item.payment_status === "successfull") {
+      return { bg: "#DFF3EB", text: "#2E7D4F" }; // Green
+    } else if (item.has_payed && item.payment_status === "pending") {
+      return { bg: "#FFF4D1", text: "#B26A00" }; // Yellow
+    } else if (item.has_payed && item.payment_status === "failed") {
+      return { bg: "#FFE3E3", text: "#D32F2F" }; // Red
+    } else {
+      return { bg: "#FFE3E3", text: "#D32F2F" }; // Not Paid (default red)
+    }
+  };
+
+  const { bg, text } = getStatusColor();
+  const statusText = getStatusText();
+
+  return (
+    <TouchableOpacity
+  key={item?.schedule_id}
+  style={styles.scheduleCard}
+  onPress={() => {
+    const isActuallyPaidOrPending =
+      item?.has_payed === true &&
+      (item?.payment_status === "success" || item?.payment_status === "pending");
+
+    if (isActuallyPaidOrPending) {
+      navigation.navigate("PaidSubs", { data: item });
+    } else {
+      navigation.navigate("ScheduleConfirmation", { data: item });
+    }
+  }}
+>
+
+      <Image source={require("../assets/schedule.png")} style={styles.binImage} />
+
+      <View style={styles.binDetails}>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text style={styles.scheduleDate}>{item?.location?.name}</Text>
+          <Text style={styles.updatedText}>{formatDate(item.last_updated)}</Text>
+        </View>
+
+        <Text style={styles.scheduleTime}>
+          {item?.subscription?.subscription_name}
         </Text>
-      ))}
-    </Text>
-  )}
 
-  <View style={styles.priceStatusContainer}>
-    <Text style={styles.binPrice}>{`GHC ${item?.price}`}</Text>
-    <View
-      style={[
-        styles.statusBadge,
-        {
-          backgroundColor: item?.has_payed ? '#DFF3EB' : '#FFE3E3',
-        },
-      ]}
-    >
-      <Text
-        style={{
-          color: item?.has_payed ? '#2E7D4F' : '#D32F2F',
-          fontWeight: '600',
-          fontSize: 12,
-        }}
-      >
-        {item?.has_payed ? 'Paid' : 'Not Paid'}
-      </Text>
-    </View>
-  </View>
-</View>
+        {item?.subscription?.schedules?.length > 0 && (
+          <Text style={styles.scheduleTime}>
+            Pickup date on{" "}
+            {item.subscription.schedules.map((schedule, idx) => (
+              <Text key={schedule.id}>
+                {schedule.day_of_the_month}
+                {getOrdinalSuffix(schedule.day_of_the_month)}
+                {idx < item.subscription.schedules.length - 1 ? ", " : ""}
+              </Text>
+            ))}
+          </Text>
+        )}
 
-  </TouchableOpacity>
-);
+        <View style={styles.priceStatusContainer}>
+          <Text style={styles.binPrice}>{`GHC ${item?.price}`}</Text>
+
+          <View style={[styles.statusBadge, { backgroundColor: bg }]}>
+            <Text style={{ color: text, fontWeight: "600", fontSize: 12 }}>
+              {statusText}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 
 
   const renderEmpty = () =>(

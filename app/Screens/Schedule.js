@@ -129,7 +129,19 @@ const Schedule = () => {
           />} style={styles.scrollContainer}>
              <View style={styles.scheduleList}>
               {schedules.map((shedule) => (
-              <View key={shedule?.schedule_id} style={styles.scheduleCard}>
+              <TouchableOpacity
+  key={shedule?.schedule_id}
+  onPress={() => {
+    const isActuallyPaidOrPending =
+      shedule?.has_payed === true &&
+      (shedule?.payment_status === "success" || shedule?.payment_status === "pending");
+
+    if (isActuallyPaidOrPending) {
+      navigation.navigate("PaidSubs", { data: shedule });
+    } else {
+      navigation.navigate("ScheduleConfirmation", { data: shedule });
+    }
+  }} style={styles.scheduleCard}>
   <Image source={require('../assets/schedule.png')} style={styles.binImage} />
 
   <View style={styles.binDetails}>
@@ -157,48 +169,51 @@ const Schedule = () => {
     <View style={styles.priceStatusContainer}>
       <Text style={styles.binPrice}>{`GHC ${shedule?.price}`}</Text>
 
-      {shedule.has_payed?<View
-        style={[
-          styles.statusBadge,
-          {
-            backgroundColor: shedule?.picked_up ? '#DFF3EB' : '#FFE3E3',
-          },
-        ]}
-      >
-        <Text
-          style={[
-            styles.statusText,
-            {
-              color: shedule?.picked_up ? '#2E7D4F' : '#D32F2F',
-            },
-          ]}
-        >
-          {shedule?.picked_up ? 'Picked up' : 'Not picked up'}
-        </Text>
-      </View> : 
       <View
-        style={[
-          styles.statusBadge,
-          {
-            backgroundColor: shedule?.has_payed ? '#DFF3EB' : '#FFE3E3',
-          },
-        ]}
-      >
-        <Text
-          style={[
-            styles.statusText,
-            {
-              color: shedule?.picked_up ? '#2E7D4F' : '#D32F2F',
-            },
-          ]}
-        >
-          {shedule?.has_payed ? 'Paid' : 'Not Paid'}
-        </Text>
-      </View>
-      }
+  style={[
+    styles.statusBadge,
+    {
+      backgroundColor:
+        shedule.has_payed && shedule.payment_status === "successfull"
+          ? shedule.picked_up
+            ? "#DFF3EB" // Green
+            : "#FFE3E3" // Red (Not picked up)
+          : shedule.has_payed && shedule.payment_status === "pending"
+          ? "#FFF4D1" // Yellow
+          : "#FFE3E3", // Red (Failed or Not Paid)
+    },
+  ]}
+>
+  <Text
+    style={[
+      styles.statusText,
+      {
+        color:
+          shedule.has_payed && shedule.payment_status === "successfull"
+            ? shedule.picked_up
+              ? "#2E7D4F" // Green text
+              : "#D32F2F" // Red text
+            : shedule.has_payed && shedule.payment_status === "pending"
+            ? "#B26A00" // Yellow text
+            : "#D32F2F", // Red text
+      },
+    ]}
+  >
+    {shedule.has_payed && shedule.payment_status === "successfull"
+      ? shedule.picked_up
+        ? "Picked up"
+        : "Not picked up"
+      : shedule.has_payed && shedule.payment_status === "pending"
+      ? "Payment pending"
+      : shedule.has_payed && shedule.payment_status === "failed"
+      ? "Payment failed"
+      : "Not Paid"}
+  </Text>
+</View>
+
     </View>
   </View>
-</View>
+</TouchableOpacity>
 
           ))}
         </View>

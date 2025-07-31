@@ -116,7 +116,7 @@ const Home = () => {
   }
 
   const pending = () => {
-    const found  = schedules?.filter(i => i.picked_up == false && i.has_payed == true)
+    const found  = schedules?.filter(i => i.picked_up == false && i.has_payed == true && i.payment_status=="successfull")
     return found?.length
   }
 
